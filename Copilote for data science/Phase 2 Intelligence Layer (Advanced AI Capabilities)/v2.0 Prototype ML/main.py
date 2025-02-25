@@ -4,9 +4,9 @@ from NL_processor import NL_processor, split_multi_commands
 from Engine_Display_data import Groq_Input as Display_Groq_Input
 from Engine_Visualize_data import Groq_Input as Visualize_Groq_Input
 from Engine_Modify_data import Groq_Input as Modify_Groq_Input
-from Machine_Learning.ML_Models_Builder import build_model
-from Machine_Learning.ML_Models_Deployer import deploy_model
-from Machine_Learning.Model_Tester import test_model
+from ML_Models_Builder import build_model
+from ML_Models_Deployer import deploy_model
+from ML_Model_Tester import test_model
 
 
 def execute_multiple_commands(user_input):

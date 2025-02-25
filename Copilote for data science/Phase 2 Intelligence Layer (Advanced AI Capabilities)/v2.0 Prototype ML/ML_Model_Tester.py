@@ -1,9 +1,12 @@
+from groq import Groq
 import pandas as pd
 from pycaret.classification import load_model, predict_model
 from pycaret.regression import load_model, predict_model
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, mean_squared_error, mean_absolute_error
-from Core_Automation_Engine.Data import Data_rows, filepath
-from Core_Automation_Engine.NL_processor import result_response
+from Data import Data_rows, filepath
+from NL_processor import result_response
+
+client = Groq(api_key="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")
 
 def test_model(user_input):
     """
@@ -38,9 +41,17 @@ def test_model(user_input):
         predictions = predict_model(model, data=df)
 
         # Evaluate the model
-        target = model._final_estimator.target
+        target = user_input.split()[-1]  # Extract the target variable from user input
+        if target not in df.columns:
+            print(f"Error: Target variable '{target}' not found in the dataset.")
+            return
         y_true = df[target]
-        y_pred = predictions["Label"]
+        # Ensure predictions contain the correct column name
+        if target in predictions.columns:
+            y_pred = predictions[target]  # Use target variable name for regression
+        else:
+            print(f"Error: Prediction column '{target}' not found in output.")
+            return
 
         if df[target].dtype == "object":  # Classification
             accuracy = accuracy_score(y_true, y_pred)
@@ -55,8 +66,12 @@ def test_model(user_input):
         else:  # Regression
             mse = mean_squared_error(y_true, y_pred)
             mae = mean_absolute_error(y_true, y_pred)
+            r2 = r2_score(y_true, y_pred)
+            accuracy = r2 * 100  # R-squared as percentage accuracy
             print(f"MSE: {mse}")
             print(f"MAE: {mae}")
+            print(f"R2 Score: {r2}")
+            print(f"Model Accuracy: {accuracy:.2f}%")
             result_response(user_input, f"Model performance: MSE={mse}, MAE={mae}")
 
     except Exception as e:
