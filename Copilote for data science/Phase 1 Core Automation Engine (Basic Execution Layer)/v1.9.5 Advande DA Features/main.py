@@ -1,11 +1,14 @@
 from NL_processor import NL_processor, split_multi_commands
 from Engine_Display_data import Groq_Input as Display_Groq_Input
-from Engine_Visualize_data import Groq_Input as Visualize_Groq_Input, Dashboard
+from Engine_Visualize_data import Groq_Input as Visualize_Groq_Input
 from Engine_Modify_data import Groq_Input as Modify_Groq_Input
 from NL_processor import genral_response_chatbot
 from Engine_Data_analysis import *
 from Data import filepath
 import pandas as pd
+
+dashboard = Dashboard()
+data_analysis_report = DataAnalysisReport()
 
 
 def execute_multiple_commands(user_input):
@@ -31,10 +34,10 @@ def execute_multiple_commands(user_input):
                 genral_response_chatbot(user_input)
             elif operation == "analyze_data":
                 print("Analyzing data...")
-                analyze_data()
+                data_analysis_report.generate_insights(user_input)
             elif operation == "generate_report":
                 print("Generating report...")
-                generate_insights()
+                data_analysis_report.generate_pdf_report(user_input)
             elif operation == "create_dashboard":
                 print("Creating dashboard...")
                 dashboard = Dashboard()
@@ -68,13 +71,13 @@ def main():
                 genral_response_chatbot(user_input)
             elif operation == "analyze_data":
                 print("Analyzing data...")
-                analyze_data()
+                data_analysis_report.generate_insights(user_input)
             elif operation == "generate_report":
-                print("Generating report...")
-                generate_insights()
+                print("Generating PDF report...")
+                data_analysis_report.generate_pdf_report(user_input)
             elif operation == "create_dashboard":
                 print("Creating dashboard...")
-                create_dashboard()
+                dashboard.create_dashboard(user_input)
             else:
                 print("Unable to determine the operation. Please try again.")
 

@@ -364,4 +364,4 @@ class DataAnalysisReport:
 
 if __name__ == "__main__":
     report = DataAnalysisReport()
-    report.generate_pdf_report("Generate a detailed PDF report")
+    report.generate_insights("annlyse the data on the basis of only ocean proximity and house value and also provide a structured parameters list")

@@ -84,13 +84,14 @@ def split_multi_commands(user_input):
     try:
         # Prompt the Groq API to split the input into commands
         prompt = (
-            f"Split the following input into individual when necessarycommands: {user_input}\n"
-            "Respond ONLY with the commands separated by '||'. For example: "
+            f"Split the following input into individual when necessary.\n"
+            f"commands: {user_input}\n"
+            f"Respond ONLY with the commands separated by '||'. For example: "
             "'Show me first 10 rows of the dataset||Visualize the main insight of data||Clean all null value rows from the whole dataset'"
         )
 
         completion = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="gemma2-9b-it",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.4,
             max_tokens=1024,
@@ -160,5 +161,6 @@ def genral_response_chatbot(user_input):
 
 
 if __name__ == "__main__":
-    user_input = "create dashboard of data"
+    user_input = "annlyse the data on the basis of only ocean proximity and house value"
     print(NL_processor(user_input))
+    print(split_multi_commands(user_input))

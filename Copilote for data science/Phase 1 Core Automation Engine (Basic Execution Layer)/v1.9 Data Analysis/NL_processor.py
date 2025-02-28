@@ -160,5 +160,6 @@ def genral_response_chatbot(user_input):
 
 
 if __name__ == "__main__":
-    user_input = "create dashboard of data"
+    user_input = "annlyse the data on the basis of only ocean proximity and house value"
     print(NL_processor(user_input))
+    print(split_multi_commands(user_input))
