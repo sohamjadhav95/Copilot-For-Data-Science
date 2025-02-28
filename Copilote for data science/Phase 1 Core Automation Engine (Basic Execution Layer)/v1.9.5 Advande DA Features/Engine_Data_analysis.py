@@ -4,6 +4,8 @@ import dash
 from dash import dcc, html, Input, Output, State
 import plotly.express as px
 from groq import Groq
+import matplotlib.pyplot as plt
+import seaborn as sns
 import webbrowser
 import pandas as pd
 from fpdf import FPDF
@@ -197,34 +199,169 @@ class Dashboard:
         return df
 
 
-def analyze_data(user_input):
-    try:
-        df = load_and_preprocess_data()
-        insights = generate_insights()
-        print("Generated Insights:")
-        print(insights)
-        generate_pdf_report(df, insights)
-        create_dashboard()
-    except Exception as e:
-        print(f"An error occurred during data analysis: {e}")
-
-
-def generate_pdf_report(df, insights):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
+class DataAnalysisReport:
+    def __init__(self):
+        """Initialize with dataset file path."""
+        self.file_path = filepath()
+        self.df = self.load_data()
     
-    pdf.cell(200, 10, txt="Data Analysis Report", ln=True, align='C')
-    pdf.cell(200, 10, txt="Summary Statistics", ln=True, align='L')
-    pdf.multi_cell(0, 10, txt=df.describe().to_string())
+    def load_data(self):
+        """Loads the dataset from a CSV file."""
+        try:
+            return pd.read_csv(self.file_path)
+        except Exception as e:
+            print(f"Error loading data: {e}")
+            return None
+
+    def generate_insights(self, user_input):
+        """Generates insights using dataset statistics and user input."""
+        if self.df is None:
+            return "No data available for analysis."
+
+        # Ensure only numeric columns are used for correlation
+        numeric_df = self.df.select_dtypes(include=['number'])  # Select numeric columns only
+        
+        # Generate statistics
+        summary = self.df.describe().to_dict()
+        correlation = numeric_df.corr().to_dict()  # Use filtered numeric dataframe
+
+        # Convert data to JSON for API processing
+        stats_json = json.dumps({
+            "summary_statistics": summary,
+            "correlation_matrix": correlation,
+            "column_names": self.df.columns.tolist(),
+            "num_rows": self.df.shape[0],
+            "num_columns": self.df.shape[1]
+        }, indent=4)
+
+        # Construct prompt for API
+        prompt = f"""
+        Analyze the following dataset statistics and provide insights:
+        Also Use this user input to generate insights accordingly: {user_input}
+        - Identify key trends, anomalies, and correlations.
+        - Detect outliers or unusual patterns.
+        - Suggest data-driven actions.
+        
+        JSON Data:
+        {stats_json}
+        
+        Respond with **detailed insights** in human-readable text.
+        """
+
+        # Call API function to get insights
+        insights = self.call_api(prompt)
+        return insights
     
-    pdf.cell(200, 10, txt="AI-Generated Insights", ln=True, align='L')
-    pdf.multi_cell(0, 10, txt=insights)
-    
-    pdf.output("report.pdf")
+    def call_api(self, prompt):
+        """Calls the API to generate insights and ensures the response is correctly extracted."""
+        
+        print("\n🔹 API Prompt Sent:\n", prompt)  # Debug: Show what is being sent
+        
+        try:
+            response = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",  # Replace with your actual model
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.5,
+                max_tokens=4096
+            )
+            
+            # Extract API response
+            raw_response = response.choices[0].message.content.strip()
+            print("\n✅ API Response Received:\n", raw_response)  # Debug: Show received insights
+            
+            return raw_response
+
+        except Exception as e:
+            print("\n❌ API Call Failed:", e)
+            return "Error: Unable to generate insights due to API failure."
+
+    def generate_pdf_report(self, user_input):
+        """Generates a detailed PDF report with insights and graphs."""
+        if self.df is None:
+            print("No data available for generating report.")
+            return
+
+        insights = self.generate_insights(user_input)
+
+        pdf = FPDF()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.add_page()
+
+        # Title
+        pdf.set_font("Arial", style='B', size=16)
+        pdf.cell(200, 10, "Data Analysis Report", ln=True, align="C")
+        pdf.ln(10)
+
+        # Dataset Summary
+        pdf.set_font("Arial", style='B', size=12)
+        pdf.cell(0, 10, "Dataset Summary:", ln=True)
+        pdf.set_font("Arial", size=10)
+        pdf.multi_cell(0, 6, f"Number of Rows: {self.df.shape[0]}\nNumber of Columns: {self.df.shape[1]}")
+        pdf.ln(5)
+
+        # **Insights Section (Fix)**
+        if insights:
+            pdf.set_font("Arial", style='B', size=12)
+            pdf.cell(0, 10, "Insights:", ln=True)
+            pdf.set_font("Arial", size=10)
+            pdf.multi_cell(0, 6, insights)  # Use multi_cell() to handle long text properly
+            pdf.ln(5)
+        else:
+            pdf.cell(0, 10, "No insights generated.", ln=True)
+
+        # Generate and add statistical graphs
+        self.add_graphs_to_pdf(pdf)
+
+        # Save PDF
+        output_path = "data_analysis_report.pdf"
+        pdf.output(output_path)
+
+        print(f"PDF Report saved to {output_path}")
 
 
+    def add_graphs_to_pdf(self, pdf):
+        """Generates and embeds statistical graphs into the PDF."""
+        
+        # Select only numeric columns
+        numeric_df = self.df.select_dtypes(include=['number'])
+        
+        if numeric_df.empty:
+            print("No numerical columns found for graph generation.")
+            return
+
+        temp_images = []
+
+        # Histogram for first numeric column
+        if len(numeric_df.columns) > 0:
+            plt.figure(figsize=(6, 4))
+            sns.histplot(numeric_df.iloc[:, 0], bins=20, kde=True, color='blue')
+            plt.title(f"Distribution of {numeric_df.columns[0]}")
+            plt.xlabel(numeric_df.columns[0])
+            plt.ylabel("Frequency")
+            hist_path = "histogram.png"
+            plt.savefig(hist_path)
+            temp_images.append(hist_path)
+            plt.close()
+
+        # Correlation heatmap (Only if there are at least 2 numeric columns)
+        if len(numeric_df.columns) > 1:
+            plt.figure(figsize=(6, 4))
+            sns.heatmap(numeric_df.corr(), annot=True, cmap="coolwarm", fmt=".2f")
+            plt.title("Feature Correlation Heatmap")
+            heatmap_path = "correlation_heatmap.png"
+            plt.savefig(heatmap_path)
+            temp_images.append(heatmap_path)
+            plt.close()
+
+        # Add images to PDF
+        pdf.add_page()
+        pdf.set_font("Arial", style='B', size=12)
+        pdf.cell(0, 10, "Statistical Graphs:", ln=True)
+
+        for img in temp_images:
+            pdf.image(img, x=10, w=180)
+            pdf.ln(60)
 
 if __name__ == "__main__":
-    dashboard = Dashboard()
-    dashboard.create_dashboard("Show me house value vs ocean proximity in bar plot")
+    report = DataAnalysisReport()
+    report.generate_pdf_report("Generate a detailed PDF report")
