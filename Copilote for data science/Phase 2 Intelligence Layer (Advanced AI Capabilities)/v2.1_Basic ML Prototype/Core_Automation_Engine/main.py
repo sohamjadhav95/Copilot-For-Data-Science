@@ -9,6 +9,10 @@ from Data import filepath
 import pandas as pd
 import time
 
+import sys
+sys.path.append("E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 2 Intelligence Layer (Advanced AI Capabilities)\v2.1_Basic ML Prototype\Machine_Learning")
+from ML_Models_Engine import deploy_model, build_model, test_model
+
 dashboard = Dashboard()
 data_analysis_report = DataAnalysisReport()
 
@@ -47,6 +51,15 @@ def execute_multiple_commands(user_input):
             elif operation == "os_operations":
                 print("Performing OS operations...")
                 os_operations(user_input)
+            elif operation == "build_model":
+                print("Building ML model...")
+                build_model(user_input)
+            elif operation == "test_model":
+                print("Testing ML model...")
+                test_model(user_input)
+            elif operation == "deploy_model":
+                print("Deploying ML model...")
+                deploy_model(user_input)
 
             else:
                 print("Unable to determine the operation. Please try again.")
@@ -87,6 +100,15 @@ def main():
             elif operation == "os_operations":
                 print("Performing OS operations...")
                 os_operations(user_input)
+            elif operation == "build_model":
+                print("Building ML model...")
+                build_model(user_input)
+            elif operation == "test_model":
+                print("Testing ML model...")
+                test_model(user_input)
+            elif operation == "deploy_model":
+                print("Deploying ML model...")
+                deploy_model(user_input)
             else:
                 print("Unable to determine the operation. Please try again.")
 

@@ -1,17 +1,19 @@
 import pandas as pd
 import os
 from autogluon.tabular import TabularPredictor
+from pyarrow import binary
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import  mean_squared_error, mean_absolute_error, r2_score, accuracy_score, mean_absolute_percentage_error
-from Data import HardcoreDataProcessor, filepath
+from Preprocessing_whole_data import DatasetPreprocessor
 import pandas as pd
 from groq import Groq
+
 
 client = Groq(api_key="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")
 
 # Preprocess data
-preprocessor = HardcoreDataProcessor(verbose=False)
-processed_file, report = preprocessor.process_dataset(filepath())
+preprocessor = DatasetPreprocessor(verbose=False)
+processed_file, report = preprocessor.process_dataset()
 
 def targeted_column(user_input):
     df = pd.read_csv(processed_file)
@@ -20,7 +22,7 @@ def targeted_column(user_input):
             f"Get the target column name for Machine Learning from user input: {user_input}.\n"
             f"Refer this avilable dataset columns: {df.columns.tolist()}\n"
             f"Respond 'ONLY With Target Column Name' as in the dataset\n"
-            f"If target column name is not mentioned in user input or in not match with dataset columns then return no_target_column"
+            f"If target column name is not mentioned in user input or in not match with dataset columns, then determine the target column by referring the dataset: {df.head(200)}"
         )
 
     completion = client.chat.completions.create(
@@ -34,14 +36,16 @@ def targeted_column(user_input):
     )
 
     response = completion.choices[0].message.content.strip()
-    print(response)
 
-    if response == "no_target_column":
-        target_column = report.get("target_column")
+    if report.get("task_type") == "clustering":
+        print("Clustering task detected. No target column required.")
+        target_column = None
     else:
         target_column = response
+        print(f"Target column: {target_column}")
+        return target_column
 
-    return target_column
+
 
 
 def build_model(user_input):
@@ -50,7 +54,7 @@ def build_model(user_input):
     """
     df = pd.read_csv(processed_file)
     task_type = report.get("task_type")
-    target_column = targeted_column(user_input) 
+    target_column = targeted_column(user_input)
 
     if not target_column or not task_type:
         print("Could not determine the target column or task type.")
@@ -74,7 +78,7 @@ def test_model(user_input):
     Loads the saved AutoGluon model and evaluates it on test data.
     """
     df = pd.read_csv(processed_file)
-    target_column = targeted_column(user_input) 
+    target_column = targeted_column(user_input)
     task_type = report.get("task_type")
     
     if not target_column or not task_type:
@@ -131,27 +135,3 @@ def deploy_model(user_input):
     if model:
         predictions = model.predict(df)  # new_data should be a pandas DataFrame
         print(predictions)
-
-
-def execute_ml_task():
-    """
-    Processes NL commands and executes ML tasks accordingly.
-    """
-    command = "test_model"  # Change this to "test_model" or "deploy_model" to test different functionalities.
-
-    if command == "build_model":
-        print("Building ML model...")
-        build_model()
-    elif command == "test_model":
-        print("Testing ML model...")
-        test_model()
-    elif command == "deploy_model":
-        print("Deploying ML model...")
-        deploy_model()
-    else:
-        print("No valid ML task found in the input.")
-
-
-if __name__ == "__main__":
-    test_model("predict the outcome from the dataset") 
-
