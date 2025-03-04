@@ -1,0 +1,8 @@
+Original dataset: diabetes_dataset.csv
+Original shape: (9538, 17)
+Processed shape: (9538, 18)
+Task type: classification
+Numerical columns: Age, Pregnancies, BMI, Glucose, BloodPressure, HbA1c, LDL, HDL, Triglycerides, WaistCircumference, HipCircumference, WHR
+Categorical columns: FamilyHistory, DietType, Hypertension, MedicationUse, Outcome
+Date columns: 
+Preprocessing timestamp: 2025-03-04 13:45:32

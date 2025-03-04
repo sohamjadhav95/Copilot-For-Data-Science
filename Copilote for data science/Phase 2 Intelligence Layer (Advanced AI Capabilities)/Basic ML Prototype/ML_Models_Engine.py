@@ -4,20 +4,53 @@ from autogluon.tabular import TabularPredictor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import  mean_squared_error, mean_absolute_error, r2_score, accuracy_score, mean_absolute_percentage_error
 from Data import HardcoreDataProcessor, filepath
+import pandas as pd
+from groq import Groq
+
+client = Groq(api_key="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")
+
+# Preprocess data
+preprocessor = HardcoreDataProcessor(verbose=False)
+processed_file, report = preprocessor.process_dataset(filepath())
+
+def targeted_column(user_input):
+    df = pd.read_csv(processed_file)
+
+    prompt = (
+            f"Get the target column name for Machine Learning from user input: {user_input}.\n"
+            f"Refer this avilable dataset columns: {df.columns.tolist()}\n"
+            f"Respond 'ONLY With Target Column Name' as in the dataset\n"
+            f"If target column name is not mentioned in user input or in not match with dataset columns then return no_target_column"
+        )
+
+    completion = client.chat.completions.create(
+        model="qwen-2.5-32b",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.4,
+        max_tokens=1024,
+        top_p=0.95,
+        stream=False,
+        stop=None,
+    )
+
+    response = completion.choices[0].message.content.strip()
+    print(response)
+
+    if response == "no_target_column":
+        target_column = report.get("target_column")
+    else:
+        target_column = response
+
+    return target_column
 
 
-def build_model():
+def build_model(user_input):
     """
     Trains an ML model using AutoGluon and saves it with target column and model name.
     """
-    # Preprocess data
-    preprocessor = HardcoreDataProcessor(verbose=False)
-    processed_file, report = preprocessor.process_dataset(filepath())
-    print("Preprocessing completed. Report: \n", report)
-    
     df = pd.read_csv(processed_file)
-    target_column = report.get("target_column")
     task_type = report.get("task_type")
+    target_column = targeted_column(user_input) 
 
     if not target_column or not task_type:
         print("Could not determine the target column or task type.")
@@ -36,15 +69,12 @@ def build_model():
     return predictor
 
 
-def test_model():
+def test_model(user_input):
     """
     Loads the saved AutoGluon model and evaluates it on test data.
     """
-    preprocessor = HardcoreDataProcessor(verbose=False)
-    processed_file, report = preprocessor.process_dataset(filepath())
-    
     df = pd.read_csv(processed_file)
-    target_column = report.get("target_column")
+    target_column = targeted_column(user_input) 
     task_type = report.get("task_type")
     
     if not target_column or not task_type:
@@ -80,14 +110,14 @@ def test_model():
         print(f"Model R² Score (Explained Variance): {r2:.2f}%")
         print(f"Model Mean Absolute Percentage Error (MAPE): {mape:.2f}%")
 
-def deploy_model():
+def deploy_model(user_input):
     """
     Loads and returns the saved AutoGluon model for deployment.
     """
-    preprocessor = HardcoreDataProcessor(verbose=False)
-    processed_file, report = preprocessor.process_dataset(filepath())
-    
-    target_column = report.get("target_column")
+
+    df = pd.read_csv(processed_file)
+
+    target_column = targeted_column(user_input)
     if not target_column:
         print("Could not determine the target column.")
         return None
@@ -97,7 +127,10 @@ def deploy_model():
     predictor = TabularPredictor.load(model_dir)
 
     print(f"Model '{target_column}' is deployed and ready for inference.")
-    return predictor
+    model = predictor
+    if model:
+        predictions = model.predict(df)  # new_data should be a pandas DataFrame
+        print(predictions)
 
 
 def execute_ml_task():
@@ -120,7 +153,5 @@ def execute_ml_task():
 
 
 if __name__ == "__main__":
-    model = deploy_model()
-    if model:
-        predictions = model.predict(pd.read_csv(filepath()))  # new_data should be a pandas DataFrame
-        print(predictions)
+    test_model("predict the outcome from the dataset") 
+
