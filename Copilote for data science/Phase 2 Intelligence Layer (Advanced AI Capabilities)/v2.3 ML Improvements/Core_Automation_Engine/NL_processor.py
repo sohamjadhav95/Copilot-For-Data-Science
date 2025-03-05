@@ -41,7 +41,7 @@ def NL_processor(user_input):
         """
 
         completion = client.chat.completions.create(
-            model="llama-3.1-8b-instant",  
+            model="gemma2-9b-it",  
             messages=[{"role": "user", "content": prompt}],
             temperature=0.4,
             max_tokens=4096,
