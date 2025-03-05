@@ -4,14 +4,15 @@ from Engine_Visualize_data import Groq_Input as Visualize_Groq_Input
 from Engine_Modify_data import Groq_Input as Modify_Groq_Input
 from NL_processor import genral_response_chatbot
 from Engine_Data_analysis import *
-from OS_Operations import os_operations
 from Data import filepath
 import pandas as pd
 import time
 
 import sys
-sys.path.append("E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 2 Intelligence Layer (Advanced AI Capabilities)\v2.1_Basic ML Prototype\Machine_Learning")
+sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 2 Intelligence Layer (Advanced AI Capabilities)\v2.2 System OS Operations\Machine_Learning")
+sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 2 Intelligence Layer (Advanced AI Capabilities)\v2.2 System OS Operations\System_OS_Operations")
 from ML_Models_Engine import deploy_model, build_model, test_model
+from Main import system_operation
 
 dashboard = Dashboard()
 data_analysis_report = DataAnalysisReport()
@@ -50,7 +51,7 @@ def execute_multiple_commands(user_input):
                 dashboard.create_dashboard(user_input)
             elif operation == "os_operations":
                 print("Performing OS operations...")
-                os_operations(user_input)
+                system_operation(user_input)
             elif operation == "build_model":
                 print("Building ML model...")
                 build_model(user_input)
@@ -99,7 +100,7 @@ def main():
                 dashboard.create_dashboard(user_input)
             elif operation == "os_operations":
                 print("Performing OS operations...")
-                os_operations(user_input)
+                system_operation(user_input)
             elif operation == "build_model":
                 print("Building ML model...")
                 build_model(user_input)

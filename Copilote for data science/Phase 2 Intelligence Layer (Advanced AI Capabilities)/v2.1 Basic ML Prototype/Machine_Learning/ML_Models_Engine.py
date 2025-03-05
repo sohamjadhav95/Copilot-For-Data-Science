@@ -11,11 +11,11 @@ from groq import Groq
 
 client = Groq(api_key="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")
 
-# Preprocess data
-preprocessor = DatasetPreprocessor(verbose=False)
-processed_file, report = preprocessor.process_dataset()
 
 def targeted_column(user_input):
+    # Preprocess data
+    preprocessor = DatasetPreprocessor(verbose=False)
+    processed_file, report = preprocessor.process_dataset()
     df = pd.read_csv(processed_file)
 
     prompt = (
@@ -46,12 +46,14 @@ def targeted_column(user_input):
         return target_column
 
 
-
-
 def build_model(user_input):
     """
     Trains an ML model using AutoGluon and saves it with target column and model name.
     """
+    # Preprocess data
+    preprocessor = DatasetPreprocessor(verbose=False)
+    processed_file, report = preprocessor.process_dataset()
+
     df = pd.read_csv(processed_file)
     task_type = report.get("task_type")
     target_column = targeted_column(user_input)
@@ -77,6 +79,10 @@ def test_model(user_input):
     """
     Loads the saved AutoGluon model and evaluates it on test data.
     """
+    # Preprocess data
+    preprocessor = DatasetPreprocessor(verbose=False)
+    processed_file, report = preprocessor.process_dataset()
+
     df = pd.read_csv(processed_file)
     target_column = targeted_column(user_input)
     task_type = report.get("task_type")
@@ -118,6 +124,9 @@ def deploy_model(user_input):
     """
     Loads and returns the saved AutoGluon model for deployment.
     """
+    # Preprocess data
+    preprocessor = DatasetPreprocessor(verbose=False)
+    processed_file, report = preprocessor.process_dataset()
 
     df = pd.read_csv(processed_file)
 

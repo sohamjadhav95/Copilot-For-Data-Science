@@ -1,4 +1,39 @@
 import pandas as pd
+data = r"C:\Users\soham\Downloads\housing.csv"
+
+def Data_rows():
+    try:
+        dataset = pd.read_csv(data)
+        first_100_rows = dataset.head(100)
+        last_100_rows = dataset.tail(100)
+        return first_100_rows, last_100_rows
+    except Exception as e:
+        print(f"An error occurred in Data_rows: {e}")
+        return None, None
+
+def filepath():
+    data_path = data
+    return data_path
+        
+def dataset_features():
+    data_path = filepath()
+    dataset = pd.read_csv(data_path)
+    
+    dataset_features = {
+        "shape": dataset.shape,
+        "size": dataset.size,
+        "columns": dataset.columns,
+        "dtypes": dataset.dtypes
+    }
+    return dataset_features
+
+
+    
+#================================================================================================
+#===================================Data Preprocessing===========================================
+
+
+import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder, OneHotEncoder
 from sklearn.impute import SimpleImputer
@@ -15,11 +50,8 @@ import json     # Add this
 import io       # Add this
 from scipy import stats  # Add this
 from groq import Groq
-from data import get_data
-from problem_identifier import identify_problem_type
 
-
-class DatasetPreprocessor:
+class HardcoreDataProcessor:
     """
     A class to preprocess any dataset (CSV) for machine learning tasks
     including regression, classification, or clustering.
@@ -233,14 +265,12 @@ class DatasetPreprocessor:
             
             self.print_info(f"\nLLM Analysis Result:")
             self.print_info(f"Target Column: {result['target_column']}")
-            # self.print_info(f"Task Type: {result['task_type']}")
-            self.print_info(f"Task Type: {identify_problem_type(self.df, self.target_column, self.client)}")
+            self.print_info(f"Task Type: {result['task_type']}")
             self.print_info(f"Confidence: {result['confidence']}%")
             self.print_info(f"Reasoning: {result['reasoning']}")
-            # self.task_type = result['task_type']
-            self.task_type = identify_problem_type(self.df, self.target_column, self.client)    # Saving Task type
+            self.task_type = result['task_type']    # Saving Task type
             
-            return result['target_column'], identify_problem_type(self.df, self.target_column, self.client)
+            return result['target_column'], result['task_type']
         except Exception as e:
             self.print_info(f"Error using LLM for target detection: {str(e)}")
             self.print_info("Falling back to heuristic methods")
@@ -326,12 +356,10 @@ class DatasetPreprocessor:
         # First try with LLM
         sample_data = self.df.head(100)  # Send first 100 rows to LLM
         llm_target, llm_task = self._get_llm_prediction(sample_data)
-
-        self.print_info(f"DF columns: {self.df.columns}")
         
-        if llm_target.upper() and llm_target.upper() in self.df.columns:
+        if llm_target and llm_target in self.df.columns:
             self.target_column = llm_target
-            self.task_type = identify_problem_type(self.df, self.target_column, self.client)
+            self.task_type = llm_task
             self.print_info(f"Using LLM-detected target: '{self.target_column}' for {self.task_type}")
             return self.target_column
         
@@ -346,23 +374,17 @@ class DatasetPreprocessor:
         Set the target column for supervised learning tasks.
         If not specified, try to detect it automatically.
         """
-        # First determine the task type
         if target_col and target_col in self.df.columns:
             self.target_column = target_col
             self.print_info(f"Target column set to: {self.target_column}")
-        else:
-            # No target specified, try to detect automatically
-            self.target_column = self.detect_ml_task()
-            self.task_type = identify_problem_type(self.df, self.target_column, self.client)  # Ensure task_type is set
-
-        # If task type is clustering, set target_column to None
-        if self.task_type == 'clustering':
-            self.target_column = None
-            self.print_info("Task type is clustering (unsupervised learning). Target column set to None.")
+            
+            # Use statistical analysis for task type detection
+            self.task_type = self.detect_task_type_statistically(self.df[self.target_column])
+            self.print_info(f"Task type set to: {self.task_type}")
+            return
         
-
-        self.print_info(f"Task type set to: {self.task_type}")
-
+        # No target specified, try to detect automatically
+        self.target_column = self.detect_ml_task()
     
     def handle_missing_values(self):
         """Handle missing values in the dataset."""
@@ -468,17 +490,6 @@ class DatasetPreprocessor:
             scaler = MinMaxScaler()
             self.df[num_cols] = scaler.fit_transform(self.df[num_cols])
             self.print_info(f"Normalized {len(num_cols)} numerical features")
-            
-    def get_target_and_task_type(self):
-        """
-        Returns the target column and task type identified for the dataset.
-        
-        Returns:
-            tuple: (target_column, task_type) where:
-                - target_column is the name of the identified target variable (or None for clustering)
-                - task_type is one of 'regression', 'classification', or 'clustering'
-        """
-        return self.target_column, self.task_type
     
     def perform_feature_engineering(self):
         """Create new features from existing ones."""
@@ -590,8 +601,8 @@ class DatasetPreprocessor:
             f.write(f"Original shape: {self.original_df.shape}\n")
             f.write(f"Processed shape: {self.df.shape}\n")
             f.write(f"Task type: {self.task_type}\n")
-            # if self.target_column:
-            f.write(f"Target column: {self.target_column}\n")
+            if self.target_column:
+                f.write(f"Target column: {self.target_column}\n")
             f.write(f"Numerical columns: {', '.join(self.numerical_columns)}\n")
             f.write(f"Categorical columns: {', '.join(self.categorical_columns)}\n")
             f.write(f"Date columns: {', '.join(self.date_columns)}\n")
@@ -607,12 +618,8 @@ class DatasetPreprocessor:
         self.print_info(f"Original dataset shape: {self.original_df.shape}")
         self.print_info(f"Processed dataset shape: {self.df.shape}")
         self.print_info(f"Task type: {self.task_type}")
-        
-        # Always show target column for supervised tasks
-        if self.task_type in ['regression', 'classification']:
+        if self.target_column:
             self.print_info(f"Target column: {self.target_column}")
-        elif self.task_type == 'clustering':
-            self.print_info("Clustering task (no target column)")
         
         # Calculate feature increase/decrease
         orig_cols = self.original_df.shape[1]
@@ -633,7 +640,7 @@ class DatasetPreprocessor:
     
     def process_dataset(self, target_col=None):
         """Run the complete preprocessing pipeline."""
-        if not self.load_data(get_data()):
+        if not self.load_data(filepath()):
             return False
         
         self.inspect_data()
@@ -646,35 +653,12 @@ class DatasetPreprocessor:
         self.normalize_numerical_features()
         self.perform_feature_engineering()
         self.handle_imbalanced_data()
-        output_file = self.save_processed_data("processed_data.csv")
+        output_file = self.save_processed_data("processed_dataset.csv")
         report = self.generate_preprocessing_report()
         
         return output_file, report
 
 
-def main():
-    """
-    Main function to run the preprocessor with direct file path input.
-    """
-    try:
-        # Example usage
-        file_path = get_data() # Replace with your actual file path
-
-         # Get the base filename without extension
-        base_name = os.path.splitext(os.path.basename(file_path))[0]
-
-
-        preprocessor = DatasetPreprocessor()
-        result = preprocessor.process_dataset()
-        
-        if result:
-            output_file, report = result
-            print(f"\nPreprocessing completed successfully. Processed data saved to: {output_file}")
-        else:
-            print("\nPreprocessing failed.")
-            
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
-
 if __name__ == "__main__":
-    main()
+    processor = HardcoreDataProcessor()
+    processor.process_dataset()
