@@ -6,7 +6,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import  mean_squared_error, mean_absolute_error, r2_score, accuracy_score, mean_absolute_percentage_error
 from Preprocessing_whole_data import DatasetPreprocessor
 import pandas as pd
+import matplotlib.pyplot as plt
 from groq import Groq
+import joblib
+
+import sys
+sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 2 Intelligence Layer (Advanced AI Capabilities)\v2.3 ML Improvements\Core_Automation_Engine")
+from Data import filepath
 
 
 client = Groq(api_key="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")
@@ -120,21 +126,18 @@ def test_model(user_input):
         print(f"Model R² Score (Explained Variance): {r2:.2f}%")
         print(f"Model Mean Absolute Percentage Error (MAPE): {mape:.2f}%")
 
-import os
-import pandas as pd
-import matplotlib.pyplot as plt
-from autogluon.tabular import TabularPredictor
-from Preprocessing_whole_data import DatasetPreprocessor
-
 
 def deploy_model(user_input):
     """
     Deploys the trained model, makes predictions, and visualizes results with actual values.
     """
-    # Preprocess data
+    # Get raw and processed data
     preprocessor = DatasetPreprocessor(verbose=False)
     processed_file, report = preprocessor.process_dataset()
-    df = pd.read_csv(processed_file)
+    raw_file = filepath()  # Get raw dataset file path
+    
+    df = pd.read_csv(processed_file)  # Processed Data
+    raw_df = pd.read_csv(raw_file)    # Raw Data (before preprocessing)
 
     target_column = targeted_column(user_input)
     if not target_column:
@@ -157,34 +160,52 @@ def deploy_model(user_input):
     X_test = df.drop(columns=[target_column]) if target_column in df.columns else df
     predictions = predictor.predict(X_test)
 
-    # Display actual vs predicted values if actual values exist
+    # Load original (raw) actual values
+    raw_actual_values = raw_df[target_column] if target_column in raw_df.columns else df[target_column]
+
+    ## ---- ✅ FIX: APPLY INVERSE TRANSFORMATION CORRECTLY ---- ##
+    scaler_path = "scalers.pkl"
+    if os.path.exists(scaler_path):
+        scalers = joblib.load(scaler_path)
+
+        if target_column in scalers:
+            scaler = scalers[target_column]
+            predictions_original = scaler.inverse_transform(predictions.values.reshape(-1, 1)).flatten()
+        else:
+            print(f"Warning: No scaler found for {target_column}. Using processed predictions.")
+            predictions_original = predictions
+    else:
+        print("Warning: No scalers file found. Using processed predictions.")
+        predictions_original = predictions
+
+    # Display actual vs predicted values in original format
     if target_column in df.columns:
         comparison_df = df[[target_column]].copy()
         comparison_df["Predicted"] = predictions
-        print("\nActual vs Predicted Values:")
-        print(comparison_df.head(20))  # Display first 20 results
+        comparison_df["Actual_Original"] = raw_actual_values
+        comparison_df["Predicted_Original"] = predictions_original  # Decoded values
 
-        # Display predictions with some features
-        display_df = df.iloc[:20].copy()  # Take first 20 rows
-        display_df["Predicted"] = predictions[:20]
-        print("\nPredictions with Some Features:")
-        print(display_df.head(20))
+        print("\nActual vs Predicted Values (Processed Data):")
+        print(comparison_df[[target_column, "Predicted"]].head(20))
+
+        print("\nActual vs Predicted Values (Original Format):")
+        print(comparison_df[["Actual_Original", "Predicted_Original"]].head(20))
 
         # Visualization
         plt.figure(figsize=(10, 6))
-        plt.scatter(df[target_column], predictions, alpha=0.5, label="Predicted vs Actual", color="blue")
-        plt.plot([df[target_column].min(), df[target_column].max()], 
-                 [df[target_column].min(), df[target_column].max()], 'r', lw=2)  # Reference line
-        plt.xlabel("Actual Values")
-        plt.ylabel("Predicted Values")
-        plt.title("Actual vs Predicted Values")
+        plt.scatter(raw_actual_values, predictions_original, alpha=0.5, label="Predicted vs Actual", color="blue")
+        plt.plot([raw_actual_values.min(), raw_actual_values.max()], 
+                 [raw_actual_values.min(), raw_actual_values.max()], 'r', lw=2)  # Reference line
+        plt.xlabel("Actual Values (Original)")
+        plt.ylabel("Predicted Values (Original)")
+        plt.title("Actual vs Predicted Values (Original Data)")
         plt.legend()
         plt.grid(True)
         plt.show()
     else:
-        print("\nPredicted Values:")
-        print(predictions.head(20))  # Show only predictions if actual values are unavailable
+        print("\nPredicted Values (Processed Data):")
+        print(predictions.head(20))
 
 
 if __name__ == "__main__":
-    deploy_model("Housing")
+    deploy_model("Predict by ML Model")

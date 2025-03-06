@@ -7,6 +7,7 @@ from datetime import datetime
 import warnings
 import argparse
 import os
+import joblib
 import glob
 import tkinter as tk
 from tkinter import filedialog, messagebox
@@ -450,18 +451,26 @@ class DatasetPreprocessor:
                 self.print_info(f"Label encoded column '{col}' (high cardinality)")
     
     def normalize_numerical_features(self):
-        """Normalize numerical features using Min-Max scaling."""
+        """Normalize numerical features using Min-Max scaling and save the scaler."""
         self.print_info("\n=== Normalizing Numerical Features ===")
-        
-        # Don't normalize the target for regression
+
         num_cols = [col for col in self.numerical_columns 
-                   if (self.task_type != 'regression' or col != self.target_column) 
-                   and col in self.df.columns]
-        
+                if (self.task_type != 'regression' or col != self.target_column) 
+                and col in self.df.columns]
+
+        self.scalers = {}  # Store scalers for each column separately
+
         if num_cols:
-            scaler = MinMaxScaler()
-            self.df[num_cols] = scaler.fit_transform(self.df[num_cols])
-            self.print_info(f"Normalized {len(num_cols)} numerical features")
+            for col in num_cols:
+                scaler = MinMaxScaler()
+                self.df[[col]] = scaler.fit_transform(self.df[[col]])
+
+                # Save the scaler for each column
+                self.scalers[col] = scaler
+
+            joblib.dump(self.scalers, "scalers.pkl")  # Save all scalers
+            self.print_info(f"Normalized {len(num_cols)} numerical features and saved scalers as 'scalers.pkl'")
+
             
     def get_target_and_task_type(self):
         """
