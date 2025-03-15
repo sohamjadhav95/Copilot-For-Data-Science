@@ -1,5 +1,5 @@
 import pandas as pd
-data = r"E:\My Space\Data\XAU\1 Min\XAU_1_MIn_1_Jan_to_11_Mar_(10_Ema)_1_2_RR_processed.csv"
+data = r"E:\My Space\Data\XAU\1 Min\XAU_1_MIn_1_Jan_to_11_Mar_(G_Channel)_1_2_RR.csv"
 
 def Data_rows():
     try:
