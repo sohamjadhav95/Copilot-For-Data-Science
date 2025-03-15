@@ -3,9 +3,9 @@ import os
 from autogluon.tabular import TabularPredictor
 from pyarrow import binary
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import  mean_squared_error, mean_absolute_error, r2_score, accuracy_score, mean_absolute_percentage_error
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, mean_absolute_percentage_error, confusion_matrix
 from Preprocessing_whole_data import DatasetPreprocessor
-import pandas as pd
+import seaborn as sns
 import matplotlib.pyplot as plt
 from groq import Groq
 import joblib
@@ -140,8 +140,10 @@ def deploy_model(user_input):
     raw_df = pd.read_csv(raw_file)    # Raw Data (before preprocessing)
 
     target_column = targeted_column(user_input)
-    if not target_column:
-        print("Could not determine the target column.")
+    task_type = report.get("task_type")
+
+    if not target_column or not task_type:
+        print("Could not determine the target column or task type.")
         return None
 
     # Define model directory
@@ -167,7 +169,6 @@ def deploy_model(user_input):
     scaler_path = "scalers.pkl"
     if os.path.exists(scaler_path):
         scalers = joblib.load(scaler_path)
-
         if target_column in scalers:
             scaler = scalers[target_column]
             predictions_original = scaler.inverse_transform(predictions.values.reshape(-1, 1)).flatten()
@@ -179,7 +180,19 @@ def deploy_model(user_input):
         predictions_original = predictions
 
     # Display actual vs predicted values in original format
-    if target_column in df.columns:
+    if task_type == "classification":
+        print("\nClassification Task - Confusion Matrix:")
+
+        # Compute confusion matrix
+        cm = confusion_matrix(raw_actual_values, predictions)
+        plt.figure(figsize=(6, 6))
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=sorted(set(raw_actual_values)), yticklabels=sorted(set(raw_actual_values)))
+        plt.xlabel("Predicted")
+        plt.ylabel("Actual")
+        plt.title("Confusion Matrix")
+        plt.show()
+    
+    else:  # Regression task
         comparison_df = df[[target_column]].copy()
         comparison_df["Predicted"] = predictions
         comparison_df["Actual_Original"] = raw_actual_values
@@ -191,19 +204,16 @@ def deploy_model(user_input):
         print("\nActual vs Predicted Values (Original Format):")
         print(comparison_df[["Actual_Original", "Predicted_Original"]].head(20))
 
-        # Visualization
+        # Visualization for Regression Task
         plt.figure(figsize=(12, 6))
         plt.plot(comparison_df.index, comparison_df["Actual_Original"], label="Actual", color="blue", linestyle="-")
         plt.plot(comparison_df.index, comparison_df["Predicted_Original"], label="Predicted", color="red", linestyle="--")
         plt.xlabel("Sample Index")
         plt.ylabel("Value")
-        plt.title("Actual vs Predicted Values")
+        plt.title("Actual vs Predicted Values (Regression)")
         plt.legend()
         plt.grid(True)
         plt.show()
-    else:
-        print("\nPredicted Values (Processed Data):")
-        print(predictions.head(20))
 
 
 if __name__ == "__main__":
