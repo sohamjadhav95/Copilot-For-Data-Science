@@ -563,7 +563,7 @@ class DatasetPreprocessor:
                 self.print_info(f"Could not apply SMOTE: {str(e)}")
         else:
             self.print_info("Data is already reasonably balanced. Skipping SMOTE.")
-    
+
     def save_processed_data(self, output_path=None):
         """Save the processed dataset to a new CSV file."""
         if output_path is None:
@@ -638,7 +638,7 @@ class DatasetPreprocessor:
         """Run the complete preprocessing pipeline."""
         if not self.load_data(get_data()):
             return False
-        
+
         self.inspect_data()
         self.identify_column_types()
         self.set_target_column(target_col)
@@ -649,35 +649,13 @@ class DatasetPreprocessor:
         self.normalize_numerical_features()
         self.perform_feature_engineering()
         self.handle_imbalanced_data()
+
         output_file = self.save_processed_data("processed_data.csv")
         report = self.generate_preprocessing_report()
-        
+
         return output_file, report
 
 
-def main():
-    """
-    Main function to run the preprocessor with direct file path input.
-    """
-    try:
-        # Example usage
-        file_path = get_data() # Replace with your actual file path
-
-         # Get the base filename without extension
-        base_name = os.path.splitext(os.path.basename(file_path))[0]
-
-
-        preprocessor = DatasetPreprocessor()
-        result = preprocessor.process_dataset()
-        
-        if result:
-            output_file, report = result
-            print(f"\nPreprocessing completed successfully. Processed data saved to: {output_file}")
-        else:
-            print("\nPreprocessing failed.")
-            
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
-
 if __name__ == "__main__":
-    main()
+    preprocessor = DatasetPreprocessor(verbose=False)
+    processed_file, report = preprocessor.process_dataset()

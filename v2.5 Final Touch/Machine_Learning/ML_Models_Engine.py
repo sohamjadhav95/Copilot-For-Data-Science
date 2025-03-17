@@ -9,6 +9,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from groq import Groq
 import joblib
+from data import get_data
 
 import sys
 sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 2 Intelligence Layer (Advanced AI Capabilities)\v2.5 Final Touch\Core_Automation_Engine")
@@ -183,6 +184,17 @@ def deploy_model(user_input):
     if task_type == "classification":
         print("\nClassification Task - Confusion Matrix:")
 
+        comparison_df = df[[target_column]].copy()
+        comparison_df["Predicted"] = predictions
+        comparison_df["Actual_Original"] = raw_actual_values
+        comparison_df["Predicted_Original"] = predictions_original  # Decoded values
+
+        print("\nActual vs Predicted Values (Processed Data):")
+        print(comparison_df[[target_column, "Predicted"]].head(20))
+
+        print("\nActual vs Predicted Values (Original Format):")
+        print(comparison_df[["Actual_Original", "Predicted_Original"]].head(20))
+
         # Compute confusion matrix
         cm = confusion_matrix(raw_actual_values, predictions)
         plt.figure(figsize=(6, 6))
@@ -216,5 +228,69 @@ def deploy_model(user_input):
         plt.show()
 
 
+def predict_custom_input(user_input):
+    """
+    Collect raw feature inputs from the user, append the input to the raw dataset,
+    run the full preprocessing pipeline on the combined data, then extract the transformed
+    custom input row for prediction.
+    """
+    # --- Step 1. Load the raw data ---
+    custom_input_file = "processed_data.csv"  # This should return the file path for the raw CSV
+    custom_input_df = pd.read_csv(custom_input_file)
+    
+    # Determine the target column using your existing function.
+    # Note: If the LLM returns a target name (e.g., "target_1") not present in raw_df,
+    # fall back to "target".
+    target_col_candidate = targeted_column(user_input)
+    if target_col_candidate in custom_input_df.columns:
+        target_column = target_col_candidate
+    else:
+        target_column = "target"
+    print(f"Using target column: {target_column}")
+    
+    # --- Step 2. Get raw input from the user ---
+    # Use the raw dataset’s column names (excluding the target)
+    raw_feature_names = [col for col in custom_input_df.columns if col != target_column]
+    
+    print("\nPlease enter values for the following raw features:")
+    custom_input = {}
+    for feature in raw_feature_names:
+        value = input(f"{feature}: ")
+        try:
+            # Try to convert to a number if possible
+            value = float(value) if '.' in value else int(value)
+        except ValueError:
+            pass
+        custom_input[feature] = value
+    custom_input_df = pd.DataFrame([custom_input])
+
+    # Load saved model
+    model_dir = f"./autogluon_model_{target_column}"
+    predictor = TabularPredictor.load(model_dir)
+
+    # Make predictions
+    y_pred = predictor.predict(custom_input_df)
+
+    # Decode predictions
+    predictions = y_pred
+
+    ## ---- ✅ FIX: APPLY INVERSE TRANSFORMATION CORRECTLY ---- ##
+    scaler_path = "scalers.pkl"
+    if os.path.exists(scaler_path):
+        scalers = joblib.load(scaler_path)
+        if target_column in scalers:
+            scaler = scalers[target_column]
+            predictions_original = scaler.inverse_transform(predictions.values.reshape(-1, 1)).flatten()
+        else:
+            print(f"Warning: No scaler found for {target_column}. Using processed predictions.")
+            predictions_original = predictions
+    else:
+        print("Warning: No scalers file found. Using processed predictions.")
+        predictions_original = predictions
+
+    print(f"\nPredicted value (encoded): {y_pred[0]}")
+    print(f"Predicted value (decoded): {predictions_original[0]}")
+
+
 if __name__ == "__main__":
-    deploy_model("Predict by ML Model")
+    predict_custom_input("Predict the target column")
