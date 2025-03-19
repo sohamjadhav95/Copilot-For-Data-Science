@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import ast
 from autogluon.tabular import TabularPredictor
 from pyarrow import binary
 from sklearn.model_selection import train_test_split
@@ -12,25 +13,32 @@ import joblib
 from data import get_data
 
 import sys
-sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 2 Intelligence Layer (Advanced AI Capabilities)\v2.5 Final Touch\Core_Automation_Engine")
+sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 2 Intelligence Layer (Advanced AI Capabilities)\v2.7 Final Touch\Core_Automation_Engine")
 from Data import filepath
 
 
 client = Groq(api_key="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")
 
-
-def targeted_column(user_input):
-    # Preprocess data
-    preprocessor = DatasetPreprocessor(verbose=False)
-    processed_file, report = preprocessor.process_dataset()
+def targeted_column(user_input, processed_file, report):
+    # Check if processed files exist
+    if os.path.exists("processed_data.csv") and os.path.exists("processed_data_metadata.txt"):
+        print("Processed files already exist. Skipping preprocessing...")
+        processed_file = "processed_data.csv"
+        report = "processed_data_metadata.json"  # Assuming the report is stored in a text file
+    else:
+        print("Processing dataset...")
+        preprocessor = DatasetPreprocessor(verbose=False)
+        processed_file, report = preprocessor.process_dataset()
+    
     df = pd.read_csv(processed_file)
 
     prompt = (
-            f"Get the target column name for Machine Learning from user input: {user_input}.\n"
-            f"Refer this avilable dataset columns: {df.columns.tolist()}\n"
-            f"Respond 'ONLY With Target Column Name' as in the dataset\n"
-            f"If target column name is not mentioned in user input or in not match with dataset columns, then determine the target column by referring the dataset: {df.head(200)}"
-        )
+        f"Get the target column name for Machine Learning from user input: {user_input}.\n"
+        f"Refer this available dataset columns: {df.columns.tolist()}\n"
+        f"Respond 'ONLY With Target Column Name' as in the dataset\n"
+        f"If target column name is not mentioned in user input or does not match dataset columns, "
+        f"then determine the target column by referring the dataset: {df.head(200)}"
+    )
 
     completion = client.chat.completions.create(
         model="qwen-2.5-32b",
@@ -57,13 +65,23 @@ def build_model(user_input):
     """
     Trains an ML model using AutoGluon and saves it with target column and model name.
     """
-    # Preprocess data
-    preprocessor = DatasetPreprocessor(verbose=False)
-    processed_file, report = preprocessor.process_dataset()
+   # Check if processed data files exist
+    processed_file_path = "processed_data.csv"
+    report_file_path = "processed_data_metadata.json"
+
+    if os.path.exists(processed_file_path) and os.path.exists(report_file_path):
+        print("Processed data files found. Skipping data processing...")
+        processed_file = processed_file_path
+        report = report_file_path
+    else:
+        # Preprocess data
+        preprocessor = DatasetPreprocessor(verbose=False)
+        processed_file, report = preprocessor.process_dataset()
+        df = pd.read_csv(processed_file)
 
     df = pd.read_csv(processed_file)
     task_type = report.get("task_type")
-    target_column = targeted_column(user_input)
+    target_column = targeted_column(user_input, processed_file, report)
 
     if not target_column or not task_type:
         print("Could not determine the target column or task type.")
@@ -82,16 +100,27 @@ def build_model(user_input):
     return predictor
 
 
+
 def test_model(user_input):
     """
     Loads the saved AutoGluon model and evaluates it on test data.
     """
-    # Preprocess data
-    preprocessor = DatasetPreprocessor(verbose=False)
-    processed_file, report = preprocessor.process_dataset()
+   # Check if processed data files exist
+    processed_file_path = "processed_data.csv"
+    report_file_path = "processed_data_metadata.json"
+
+    if os.path.exists(processed_file_path) and os.path.exists(report_file_path):
+        print("Processed data files found. Skipping data processing...")
+        processed_file = processed_file_path
+        report = report_file_path
+    else:
+        # Preprocess data
+        preprocessor = DatasetPreprocessor(verbose=False)
+        processed_file, report = preprocessor.process_dataset()
+        df = pd.read_csv(processed_file)
 
     df = pd.read_csv(processed_file)
-    target_column = targeted_column(user_input)
+    target_column = targeted_column(user_input, processed_file, report)
     task_type = report.get("task_type")
     
     if not target_column or not task_type:
@@ -132,15 +161,25 @@ def deploy_model(user_input):
     """
     Deploys the trained model, makes predictions, and visualizes results with actual values.
     """
-    # Get raw and processed data
-    preprocessor = DatasetPreprocessor(verbose=False)
-    processed_file, report = preprocessor.process_dataset()
+   # Check if processed data files exist
+    processed_file_path = "processed_data.csv"
+    report_file_path = "processed_data_metadata.json"
+
+    if os.path.exists(processed_file_path) and os.path.exists(report_file_path):
+        print("Processed data files found. Skipping data processing...")
+        processed_file = processed_file_path
+        report = report_file_path
+    else:
+        # Preprocess data
+        preprocessor = DatasetPreprocessor(verbose=False)
+        processed_file, report = preprocessor.process_dataset()
+        df = pd.read_csv(processed_file)
+
+    df = pd.read_csv(processed_file)
     raw_file = filepath()  # Get raw dataset file path
-    
-    df = pd.read_csv(processed_file)  # Processed Data
     raw_df = pd.read_csv(raw_file)    # Raw Data (before preprocessing)
 
-    target_column = targeted_column(user_input)
+    target_column = targeted_column(user_input, processed_file, report)
     task_type = report.get("task_type")
 
     if not target_column or not task_type:
@@ -234,15 +273,28 @@ def predict_custom_input(user_input):
     run the full preprocessing pipeline on the combined data, then extract the transformed
     custom input row for prediction.
     """
-    # --- Step 1. Load the raw data ---
-    custom_input_file = "processed_data.csv"  # This should return the file path for the raw CSV
-    custom_input_df = pd.read_csv(custom_input_file)
+       # Check if processed data files exist
+    processed_file_path = "processed_data.csv"
+    report_file_path = "processed_data_metadata.json"
+
+    if os.path.exists(processed_file_path) and os.path.exists(report_file_path):
+        print("Processed data files found. Skipping data processing...")
+        processed_file = processed_file_path
+        report = report_file_path
+    else:
+        # Preprocess data
+        preprocessor = DatasetPreprocessor(verbose=False)
+        processed_file, report = preprocessor.process_dataset()
+        df = pd.read_csv(processed_file)
+
+
+    df = pd.read_csv(processed_file)
     
     # Determine the target column using your existing function.
     # Note: If the LLM returns a target name (e.g., "target_1") not present in raw_df,
     # fall back to "target".
-    target_col_candidate = targeted_column(user_input)
-    if target_col_candidate in custom_input_df.columns:
+    target_col_candidate = targeted_column(user_input, processed_file, report)
+    if target_col_candidate in df.columns:
         target_column = target_col_candidate
     else:
         target_column = "target"
@@ -293,4 +345,5 @@ def predict_custom_input(user_input):
 
 
 if __name__ == "__main__":
-    predict_custom_input("Predict the target column")
+    user_input = "Deploy the model"
+    deploy_model(user_input)
