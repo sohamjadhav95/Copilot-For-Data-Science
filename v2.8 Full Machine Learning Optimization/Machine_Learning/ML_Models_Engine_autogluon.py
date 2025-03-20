@@ -7,6 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from groq import Groq
 import joblib
+from pycaret.clustering import *
 from sklearn.preprocessing import LabelEncoder
 
 import sys
@@ -187,6 +188,7 @@ def deploy_model(user_input):
     if not os.path.exists(MODEL_DIR):
         print("Model not found! Training the model before deploying.")
         build_model_and_test(user_input)
+        deploy_model(user_input)
         return
 
     predictor = TabularPredictor.load(MODEL_DIR)
@@ -218,16 +220,17 @@ def deploy_model(user_input):
         plt.show()
     else:
         if num_classes == 2:
-            # Bar plot for binary classification
-            unique_labels = np.unique(y_actual)
-            cm = confusion_matrix(y_actual, y_pred)
-            class_labels = [str(label) for label in unique_labels]
+            # Grouped Bar Plot: Actual vs Predicted Count
+            actual_counts = pd.Series(y_actual).value_counts().sort_index()
+            predicted_counts = pd.Series(y_pred).value_counts().sort_index()
 
-            plt.figure(figsize=(6, 4))
-            sns.barplot(x=class_labels, y=cm.diagonal(), palette="Blues")
+            comparison_df = pd.DataFrame({'Actual': actual_counts, 'Predicted': predicted_counts}).fillna(0)
+            comparison_df.plot(kind="bar", figsize=(6, 4), colormap="coolwarm")
             plt.xlabel("Class")
-            plt.ylabel("Correct Predictions")
-            plt.title("Correct Predictions per Class")
+            plt.ylabel("Count")
+            plt.title("Actual vs Predicted Class Distribution")
+            plt.xticks(rotation=0)
+            plt.legend()
             plt.show()
         else:
             # Confusion Matrix for multiclass classification
@@ -284,7 +287,9 @@ def predict_custom_input(user_input):
     print(f"\nPredicted Value: {prediction.values[0]}")
     return prediction.values[0]
 
+#======================================================================================
 
 if __name__ == "__main__":
-    user_input = "Deploy the model"
-    build_model_and_test(user_input)
+   deploy_model(user_input="predict the target column for this dataset")
+
+

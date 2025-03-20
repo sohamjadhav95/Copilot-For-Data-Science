@@ -13,7 +13,7 @@ from groq import Groq
 import sys
 sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 2 Intelligence Layer (Advanced AI Capabilities)\v2.8 Full Machine Learning Optimization\Machine_Learning")
 sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 2 Intelligence Layer (Advanced AI Capabilities)\v2.8 Full Machine Learning Optimization\System_OS_Operations")
-from ML_Models_Engine import deploy_model, build_model, test_model
+from ML_Models_Engine_autogluon import *
 from Main import system_operation
 
 client = Groq(api_key="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")
