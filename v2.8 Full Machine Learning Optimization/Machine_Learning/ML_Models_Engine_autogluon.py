@@ -22,6 +22,47 @@ from Data import filepath
 
 client = Groq(api_key="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")
 
+def task_type(self):
+    """
+    Determines the machine learning task type based on the dataset and user input.
+    Returns: 'Regression', 'Binary Classification', 'Multiclass Classification', or 'Clustering'
+    """
+    df = pd.read_csv(filepath())
+    dtype = df.dtypes
+
+    # Create prompt for Groq API
+    prompt = (
+        f"Determine the machine learning task type based on this information:\n"
+        f"Data types: {dtype}\n"
+        f"Sample dataset: {df.head(100)}\n\n"
+        f"Choose ONLY ONE from these options:\n"
+        f"- Regression: if target is continuous numeric\n"
+        f"- Binary Classification: if target has exactly 2 unique values\n"
+        f"- Multiclass Classification: if target has more than 2 unique categorical values\n"
+        f"- Clustering: if no clear target column exists\n"
+        f"Respond ONLY with the chosen task type."
+    )
+    
+
+    completion = client.chat.completions.create(
+        model="qwen-2.5-32b",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.2,
+        max_tokens=50,
+        top_p=0.9,
+        stream=False,
+        stop=None,
+    )
+    task = completion.choices[0].message.content.strip()
+    print(f"Task type: {task}")
+    
+    # Validate response
+    valid_tasks = ['Regression', 'Binary Classification', 'Multiclass Classification', 'Clustering']
+    if task not in valid_tasks:
+        raise ValueError(f"Invalid task type received: {task}")
+        
+    return task
+
 class SupervisedMachineLearning:
     def targeted_column(self, user_input):
         df = pd.read_csv(filepath())
@@ -56,47 +97,6 @@ class SupervisedMachineLearning:
 
         print(f"Target column: {target_column}")
         return target_column
-
-    def task_type(self):
-        """
-        Determines the machine learning task type based on the dataset and user input.
-        Returns: 'Regression', 'Binary Classification', 'Multiclass Classification', or 'Clustering'
-        """
-        df = pd.read_csv(filepath())
-        dtype = df.dtypes
-
-        # Create prompt for Groq API
-        prompt = (
-            f"Determine the machine learning task type based on this information:\n"
-            f"Data types: {dtype}\n"
-            f"Sample dataset: {df.head(100)}\n\n"
-            f"Choose ONLY ONE from these options:\n"
-            f"- Regression: if target is continuous numeric\n"
-            f"- Binary Classification: if target has exactly 2 unique values\n"
-            f"- Multiclass Classification: if target has more than 2 unique categorical values\n"
-            f"- Clustering: if no clear target column exists\n"
-            f"Respond ONLY with the chosen task type."
-        )
-        
-
-        completion = client.chat.completions.create(
-            model="qwen-2.5-32b",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.2,
-            max_tokens=50,
-            top_p=0.9,
-            stream=False,
-            stop=None,
-        )
-        task = completion.choices[0].message.content.strip()
-        print(f"Task type: {task}")
-        
-        # Validate response
-        valid_tasks = ['Regression', 'Binary Classification', 'Multiclass Classification', 'Clustering']
-        if task not in valid_tasks:
-            raise ValueError(f"Invalid task type received: {task}")
-            
-        return task
             
     #======================================================================================
 
@@ -113,7 +113,7 @@ class SupervisedMachineLearning:
         ENCODER_PATH = os.path.join(MODEL_DIR, "label_encoder.pkl")
 
         # Load dataset
-        task = self.task_type()
+        task = task_type(user_input)
         print(f"Task Type: {task}")
         df = pd.read_csv(DATA_PATH)
         print(f"Dataset:\n{df.head()}")
@@ -425,8 +425,19 @@ class UnsupervisedMachineLearning:
         return prediction[0]
 
 #======================================================================================
-if __name__ == "__main__":
-    USL  = UnsupervisedMachineLearning()
-    USL.predict_custom_input()
 
+def main():
+    user_input = "Train Machine learning Model"
+    if task_type(user_input) == "Clustering":
+        USL = UnsupervisedMachineLearning()
+        USL.build_model_and_test()
+        USL.deploy_model()
+        USL.predict_custom_input()
+    else:
+        ML = SupervisedMachineLearning()
+        ML.build_model_and_test(user_input)
+        ML.deploy_model(user_input)
+        ML.predict_custom_input(user_input)
+
+main()
 
