@@ -63,7 +63,7 @@ def task_type(self):
         
     return task
 
-class SupervisedMachineLearning:
+class SuperUniversalMachineLearning:
     def targeted_column(self, user_input):
         df = pd.read_csv(filepath())
 
@@ -105,59 +105,64 @@ class SupervisedMachineLearning:
         """
         Trains an ML model using AutoGluon if it does not exist and always performs testing.
         """
-        # Universal Parameters
-        DATA_PATH = filepath()
-        target_column = self.targeted_column(user_input)
-        MODEL_DIR = f"./autogluon_model_{target_column}"
-        LABEL_COLUMN = target_column
-        ENCODER_PATH = os.path.join(MODEL_DIR, "label_encoder.pkl")
-
-        # Load dataset
-        task = task_type(user_input)
-        print(f"Task Type: {task}")
-        df = pd.read_csv(DATA_PATH)
-        print(f"Dataset:\n{df.head()}")
-
-        # Check if model already exists
-        if os.path.exists(MODEL_DIR):
-            print(f"Model found at {MODEL_DIR}. Skipping training and proceeding with testing.")
-            predictor = TabularPredictor.load(MODEL_DIR)
-
-            # Load label encoder if applicable
-            if os.path.exists(ENCODER_PATH):
-                label_encoder = joblib.load(ENCODER_PATH)
-                if df[LABEL_COLUMN].dtype == 'object':
-                    df[LABEL_COLUMN] = label_encoder.transform(df[LABEL_COLUMN])
+        if task_type(user_input) == "Clustering":
+            USL = UnsupervisedMachineLearning()
+            USL.build_model_and_test()
+            return
         else:
-            print(f"Training new model and saving to {MODEL_DIR}.")
-            os.makedirs(MODEL_DIR, exist_ok=True)
+            # Universal Parameters
+            DATA_PATH = filepath()
+            target_column = self.targeted_column(user_input)
+            MODEL_DIR = f"./autogluon_model_{target_column}"
+            LABEL_COLUMN = target_column
+            ENCODER_PATH = os.path.join(MODEL_DIR, "label_encoder.pkl")
 
-            # Encode categorical target variable if needed
-            if df[LABEL_COLUMN].dtype == 'object':
-                label_encoder = LabelEncoder()
-                df[LABEL_COLUMN] = label_encoder.fit_transform(df[LABEL_COLUMN])
-                joblib.dump(label_encoder, ENCODER_PATH)  # ✅ Save encoder
+            # Load dataset
+            task = task_type(user_input)
+            print(f"Task Type: {task}")
+            df = pd.read_csv(DATA_PATH)
+            print(f"Dataset:\n{df.head()}")
 
-            # Train Model
-            predictor = TabularPredictor(label=LABEL_COLUMN, path=MODEL_DIR).fit(df)
+            # Check if model already exists
+            if os.path.exists(MODEL_DIR):
+                print(f"Model found at {MODEL_DIR}. Skipping training and proceeding with testing.")
+                predictor = TabularPredictor.load(MODEL_DIR)
 
-        # Perform Testing (Always)
-        X_test = df.drop(columns=[LABEL_COLUMN])
-        y_actual = df[LABEL_COLUMN]
-        y_pred = predictor.predict(X_test)
+                # Load label encoder if applicable
+                if os.path.exists(ENCODER_PATH):
+                    label_encoder = joblib.load(ENCODER_PATH)
+                    if df[LABEL_COLUMN].dtype == 'object':
+                        df[LABEL_COLUMN] = label_encoder.transform(df[LABEL_COLUMN])
+            else:
+                print(f"Training new model and saving to {MODEL_DIR}.")
+                os.makedirs(MODEL_DIR, exist_ok=True)
 
-        # Evaluation Metrics
-        if df[LABEL_COLUMN].dtype in [np.float64, np.int64]:  # Regression Task
-            r2 = r2_score(y_actual, y_pred)
-            mape = mean_absolute_percentage_error(y_actual, y_pred)
-            accuracy = 100 * (1 - mape)  # Interpreted accuracy for regression
+                # Encode categorical target variable if needed
+                if df[LABEL_COLUMN].dtype == 'object':
+                    label_encoder = LabelEncoder()
+                    df[LABEL_COLUMN] = label_encoder.fit_transform(df[LABEL_COLUMN])
+                    joblib.dump(label_encoder, ENCODER_PATH)  # ✅ Save encoder
 
-            print(f"R² Score: {r2 * 100:.2f}%")
-            print(f"Accuracy (based on MAPE): {accuracy:.2f}%")
+                # Train Model
+                predictor = TabularPredictor(label=LABEL_COLUMN, path=MODEL_DIR).fit(df)
 
-        else:  # Classification Task
-            accuracy = accuracy_score(y_actual, y_pred)
-            print(f"Classification Accuracy: {accuracy * 100:.2f}%")
+            # Perform Testing (Always)
+            X_test = df.drop(columns=[LABEL_COLUMN])
+            y_actual = df[LABEL_COLUMN]
+            y_pred = predictor.predict(X_test)
+
+            # Evaluation Metrics
+            if df[LABEL_COLUMN].dtype in [np.float64, np.int64]:  # Regression Task
+                r2 = r2_score(y_actual, y_pred)
+                mape = mean_absolute_percentage_error(y_actual, y_pred)
+                accuracy = 100 * (1 - mape)  # Interpreted accuracy for regression
+
+                print(f"R² Score: {r2 * 100:.2f}%")
+                print(f"Accuracy (based on MAPE): {accuracy:.2f}%")
+
+            else:  # Classification Task
+                accuracy = accuracy_score(y_actual, y_pred)
+                print(f"Classification Accuracy: {accuracy * 100:.2f}%")
 
 
 
@@ -166,115 +171,124 @@ class SupervisedMachineLearning:
         """
         Deploy the trained model, make predictions, and visualize actual vs predicted values.
         """
-
-        # Universal Parameters
-        DATA_PATH = filepath()
-        target_column = self.targeted_column(user_input)
-        MODEL_DIR = f"./autogluon_model_{target_column}"
-        LABEL_COLUMN = target_column
-        ENCODER_PATH = os.path.join(MODEL_DIR, "label_encoder.pkl") 
-
-        if not os.path.exists(MODEL_DIR):
-            print("Model not found! Training the model before deploying.")
-            self.build_model_and_test(user_input)
-            self.deploy_model(user_input)
+        if task_type(user_input) == "Clustering":
+            USL = UnsupervisedMachineLearning()
+            USL.deploy_model()
             return
-
-        predictor = TabularPredictor.load(MODEL_DIR)
-        print("Model is deployed and ready for inference.")
-
-        df = pd.read_csv(DATA_PATH)
-
-        # Encode categorical labels for consistency
-        if df[LABEL_COLUMN].dtype == 'object':
-            label_encoder = joblib.load(ENCODER_PATH)  # ✅ Load encoder
-            df[LABEL_COLUMN] = label_encoder.transform(df[LABEL_COLUMN])
-
-        X_test = df.drop(columns=[LABEL_COLUMN])
-        y_actual = df[LABEL_COLUMN]
-        y_pred = predictor.predict(X_test)
-
-        # Determine Task Type (Regression or Classification)
-        num_classes = len(np.unique(y_actual))
-        
-        if num_classes > 10:  # Regression (Assuming >10 unique values is a regression task)
-            plt.figure(figsize=(12, 6))
-            plt.plot(range(len(y_actual)), y_actual, label="Actual", color="blue", linestyle="-")
-            plt.plot(range(len(y_pred)), y_pred, label="Predicted", color="red", linestyle="--")
-            plt.xlabel("Sample Index")
-            plt.ylabel(LABEL_COLUMN)
-            plt.title("Actual vs Predicted Values")
-            plt.legend()
-            plt.grid(True)
-            plt.show()
         else:
-            if num_classes == 2:
-                # Grouped Bar Plot: Actual vs Predicted Count
-                actual_counts = pd.Series(y_actual).value_counts().sort_index()
-                predicted_counts = pd.Series(y_pred).value_counts().sort_index()
+            # Universal Parameters
+            DATA_PATH = filepath()
+            target_column = self.targeted_column(user_input)
+            MODEL_DIR = f"./autogluon_model_{target_column}"
+            LABEL_COLUMN = target_column
+            ENCODER_PATH = os.path.join(MODEL_DIR, "label_encoder.pkl") 
 
-                comparison_df = pd.DataFrame({'Actual': actual_counts, 'Predicted': predicted_counts}).fillna(0)
-                comparison_df.plot(kind="bar", figsize=(6, 4), colormap="coolwarm")
-                plt.xlabel("Class")
-                plt.ylabel("Count")
-                plt.title("Actual vs Predicted Class Distribution")
-                plt.xticks(rotation=0)
+            if not os.path.exists(MODEL_DIR):
+                print("Model not found! Training the model before deploying.")
+                self.build_model_and_test(user_input)
+                self.deploy_model(user_input)
+                return
+
+            predictor = TabularPredictor.load(MODEL_DIR)
+            print("Model is deployed and ready for inference.")
+
+            df = pd.read_csv(DATA_PATH)
+
+            # Encode categorical labels for consistency
+            if df[LABEL_COLUMN].dtype == 'object':
+                label_encoder = joblib.load(ENCODER_PATH)  # ✅ Load encoder
+                df[LABEL_COLUMN] = label_encoder.transform(df[LABEL_COLUMN])
+
+            X_test = df.drop(columns=[LABEL_COLUMN])
+            y_actual = df[LABEL_COLUMN]
+            y_pred = predictor.predict(X_test)
+
+            # Determine Task Type (Regression or Classification)
+            num_classes = len(np.unique(y_actual))
+            
+            if num_classes > 10:  # Regression (Assuming >10 unique values is a regression task)
+                plt.figure(figsize=(12, 6))
+                plt.plot(range(len(y_actual)), y_actual, label="Actual", color="blue", linestyle="-")
+                plt.plot(range(len(y_pred)), y_pred, label="Predicted", color="red", linestyle="--")
+                plt.xlabel("Sample Index")
+                plt.ylabel(LABEL_COLUMN)
+                plt.title("Actual vs Predicted Values")
                 plt.legend()
+                plt.grid(True)
                 plt.show()
             else:
-                # Confusion Matrix for multiclass classification
-                cm = confusion_matrix(y_actual, y_pred)
-                plt.figure(figsize=(8, 6))
-                sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=label_encoder.classes_, yticklabels=label_encoder.classes_)
-                plt.xlabel("Predicted")
-                plt.ylabel("Actual")
-                plt.title("Confusion Matrix")
-                plt.show()
+                if num_classes == 2:
+                    # Grouped Bar Plot: Actual vs Predicted Count
+                    actual_counts = pd.Series(y_actual).value_counts().sort_index()
+                    predicted_counts = pd.Series(y_pred).value_counts().sort_index()
 
-        print("\nSample Predictions:")
-        comparison_df = pd.DataFrame({"Actual": y_actual, "Predicted": y_pred})
-        print(comparison_df.head(20))
+                    comparison_df = pd.DataFrame({'Actual': actual_counts, 'Predicted': predicted_counts}).fillna(0)
+                    comparison_df.plot(kind="bar", figsize=(6, 4), colormap="coolwarm")
+                    plt.xlabel("Class")
+                    plt.ylabel("Count")
+                    plt.title("Actual vs Predicted Class Distribution")
+                    plt.xticks(rotation=0)
+                    plt.legend()
+                    plt.show()
+                else:
+                    # Confusion Matrix for multiclass classification
+                    cm = confusion_matrix(y_actual, y_pred)
+                    plt.figure(figsize=(8, 6))
+                    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=label_encoder.classes_, yticklabels=label_encoder.classes_)
+                    plt.xlabel("Predicted")
+                    plt.ylabel("Actual")
+                    plt.title("Confusion Matrix")
+                    plt.show()
+
+            print("\nSample Predictions:")
+            comparison_df = pd.DataFrame({"Actual": y_actual, "Predicted": y_pred})
+            print(comparison_df.head(20))
 
 
     def predict_custom_input(self, user_input):
         """
         Collect raw feature inputs from the user, transform them, and make predictions using the trained model.
         """
-        # Load dataset to extract feature names
-        df = pd.read_csv(filepath())
-        print(f"Sample Dataset:\n{df.head()}")
-        target_column = self.targeted_column(user_input)
-        feature_names = [col for col in df.columns if col != target_column]
+        if task_type(user_input) == "Clustering":
+            USL = UnsupervisedMachineLearning()
+            USL.predict_custom_input()
+            return
+        else:
+            # Load dataset to extract feature names
+            df = pd.read_csv(filepath())
+            print(f"Sample Dataset:\n{df.head()}")
+            target_column = self.targeted_column(user_input)
+            feature_names = [col for col in df.columns if col != target_column]
 
-        # Check if model directory exists
-        model_dir = f"./autogluon_model_{target_column}"
-        if not os.path.exists(model_dir):
-            print(f"Error: Model directory {model_dir} not found!")
-            return None
+            # Check if model directory exists
+            model_dir = f"./autogluon_model_{target_column}"
+            if not os.path.exists(model_dir):
+                print(f"Error: Model directory {model_dir} not found!")
+                return None
 
-        # Get user input for each feature
-        print("\nEnter values for the following features:")
-        user_values = {}
-        for feature in feature_names:
-            value = input(f"{feature}: ")
-            try:
-                value = float(value) if "." in value else int(value)
-            except ValueError:
-                pass
-            user_values[feature] = value
+            # Get user input for each feature
+            print("\nEnter values for the following features:")
+            user_values = {}
+            for feature in feature_names:
+                value = input(f"{feature}: ")
+                try:
+                    value = float(value) if "." in value else int(value)
+                except ValueError:
+                    pass
+                user_values[feature] = value
 
-        # Convert user input to a DataFrame
-        input_df = pd.DataFrame([user_values])
+            # Convert user input to a DataFrame
+            input_df = pd.DataFrame([user_values])
 
-        # Load trained model
-        model_dir = f"./autogluon_model_{target_column}"
-        predictor = TabularPredictor.load(model_dir)
+            # Load trained model
+            model_dir = f"./autogluon_model_{target_column}"
+            predictor = TabularPredictor.load(model_dir)
 
-        # Make prediction
-        prediction = predictor.predict(input_df)
+            # Make prediction
+            prediction = predictor.predict(input_df)
 
-        print(f"\nPredicted Value: {prediction.values[0]}")
-        return prediction.values[0]
+            print(f"\nPredicted Value: {prediction.values[0]}")
+            return prediction.values[0]
 
 #======================================================================================
 
@@ -425,19 +439,18 @@ class UnsupervisedMachineLearning:
         return prediction[0]
 
 #======================================================================================
-
-def main():
-    user_input = "Train Machine learning Model"
-    if task_type(user_input) == "Clustering":
-        USL = UnsupervisedMachineLearning()
-        USL.build_model_and_test()
-        USL.deploy_model()
-        USL.predict_custom_input()
-    else:
-        ML = SupervisedMachineLearning()
-        ML.build_model_and_test(user_input)
-        ML.deploy_model(user_input)
-        ML.predict_custom_input(user_input)
-
-main()
+if __name__ == "__main__":  
+    def main():
+        user_input = "Train Machine learning Model"
+        if task_type(user_input) == "Clustering":
+            USL = UnsupervisedMachineLearning()
+            USL.build_model_and_test()
+            USL.deploy_model()
+            USL.predict_custom_input()
+        else:
+            ML = SuperUniversalMachineLearning()
+            ML.build_model_and_test(user_input)
+            ML.deploy_model(user_input)
+            ML.predict_custom_input(user_input)
+    main()
 

@@ -18,8 +18,7 @@ from Main import system_operation
 
 client = Groq(api_key="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")
 
-dashboard = Dashboard()
-data_analysis_report = DataAnalysisReport()
+ML = SuperUniversalMachineLearning()
 
 
 # Universal Error Handler
@@ -110,13 +109,16 @@ def route_command(operation, user_input):
         safe_execute(dashboard.create_dashboard, user_input)
     elif operation == "build_model":
         print("Building ML model...")
-        safe_execute(build_model, user_input)
+        safe_execute(ML.build_model_and_test, user_input)
     elif operation == "test_model":
         print("Testing ML model...")
-        safe_execute(test_model, user_input)
+        safe_execute(ML.build_model_and_test, user_input)
     elif operation == "deploy_model":
         print("Deploying ML model...")
-        safe_execute(deploy_model, user_input)
+        safe_execute(ML.deploy_model, user_input)
+    elif operation == "predict_custom_input":
+        print("Predicting custom input...")
+        safe_execute(ML.predict_custom_input, user_input)
     elif operation == "os_operations":
         print("Performing OS operations...")
         safe_execute(system_operation, user_input)
