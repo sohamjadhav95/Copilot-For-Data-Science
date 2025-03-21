@@ -17,6 +17,7 @@ def NL_processor(user_input):
         - 'build' → Building an ML model using AutoML.
         - 'predict' or 'deploy' → Deploying an ML model.
         - 'test' → Testing an ML model.
+        - 'predict custom input' → Predicting custom input.
         4. **Data Analysis & Reporting:**
         - 'analyze' → Performing data analysis.
         - 'report' → Generating a data report.
@@ -35,6 +36,7 @@ def NL_processor(user_input):
         - 'build_model' (for ML model building)
         - 'deploy_model' (for ML model deployment or prediction)
         - 'test_model' (for ML model testing)
+        - 'predict_custom_input' (for predicting custom input from user)
         - 'analyze_data' (for data analysis)
         - 'generate_report' (for report generation)
         - 'create_dashboard' (for dashboard creation)
@@ -69,6 +71,8 @@ def NL_processor(user_input):
             return "deploy_model"
         elif "test_model" in response:
             return "test_model"
+        elif "predict_custom_input" in response:
+            return "predict_custom_input"
         elif "analyze_data" in response:
             return "analyze_data"
         elif "generate_report" in response:

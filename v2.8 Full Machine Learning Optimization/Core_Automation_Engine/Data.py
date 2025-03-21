@@ -1,5 +1,5 @@
 import pandas as pd
-data = r"C:\Users\soham\Downloads\housing.csv"
+data = r"C:\Users\soham\Downloads\Cardiovascular_Disease_Dataset.csv"
 
 def Data_rows():
     try:
