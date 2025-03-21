@@ -61,7 +61,7 @@ def update_csv_file(file_path):
                 clean_numeric_column(df, column, remove_chars=[','])
     
     # Save cleaned data back to CSV
-    df.to_csv(file_path, index=False)
+    df.to_csv("updated_file.csv", index=False)
     return file_path
 
 def get_sample_rows(df, n=100):

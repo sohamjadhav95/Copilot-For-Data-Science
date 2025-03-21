@@ -192,13 +192,12 @@ def deploy_model(user_input):
         print(comparison_df[["Actual_Original", "Predicted_Original"]].head(20))
 
         # Visualization
-        plt.figure(figsize=(10, 6))
-        plt.scatter(raw_actual_values, predictions_original, alpha=0.5, label="Predicted vs Actual", color="blue")
-        plt.plot([raw_actual_values.min(), raw_actual_values.max()], 
-                 [raw_actual_values.min(), raw_actual_values.max()], 'r', lw=2)  # Reference line
-        plt.xlabel("Actual Values (Original)")
-        plt.ylabel("Predicted Values (Original)")
-        plt.title("Actual vs Predicted Values (Original Data)")
+        plt.figure(figsize=(12, 6))
+        plt.plot(comparison_df.index, comparison_df["Actual_Original"], label="Actual", color="blue", linestyle="-")
+        plt.plot(comparison_df.index, comparison_df["Predicted_Original"], label="Predicted", color="red", linestyle="--")
+        plt.xlabel("Sample Index")
+        plt.ylabel("Value")
+        plt.title("Actual vs Predicted Values")
         plt.legend()
         plt.grid(True)
         plt.show()
