@@ -78,53 +78,58 @@ def execute_multiple_commands(user_input):
     commands = split_multi_commands(user_input)  # Split the input into commands
     for command in commands:
         if command:
-            print(f"\nExecuting command: {command}")
-            operation = NL_processor(command)
-            basic_rag(operation)
-            route_command(operation, command)
+            refined_user_input_by_rag = basic_rag(command)
+            print(f"\nExecuting command: {refined_user_input_by_rag}")
+            operation = NL_processor(refined_user_input_by_rag)
+            route_command(operation, refined_user_input_by_rag)
 
 @handle_errors
 def route_command(operation, user_input):
     """Routes command execution based on operation type."""
+
+    refined_user_input_by_rag = basic_rag(user_input)
+    print(f"\nExecuting command: {refined_user_input_by_rag}")
+    operation = NL_processor(refined_user_input_by_rag)
+
     if operation == "visualize":
         print("Visualizing data...")
-        safe_execute(Visualize_Groq_Input, user_input)
+        safe_execute(Visualize_Groq_Input, refined_user_input_by_rag)
     elif operation == "display":
         print("Displaying data...")
-        safe_execute(Display_Groq_Input, user_input)
+        safe_execute(Display_Groq_Input, refined_user_input_by_rag)
     elif operation == "modify":
         print("Modifying data...")
-        safe_execute(Modify_Groq_Input, user_input)
+        safe_execute(Modify_Groq_Input, refined_user_input_by_rag)
     elif operation == "undo":
         print("Undoing last modification...")
         safe_execute(undo_last_change)
     elif operation == "meaningful_response":
         print("Generating a response...")
-        safe_execute(genral_response_chatbot, user_input)
+        safe_execute(genral_response_chatbot, refined_user_input_by_rag)
     elif operation == "analyze_data":
         print("Analyzing data...")
-        safe_execute(data_analysis_report.generate_insights, user_input)
+        safe_execute(data_analysis_report.generate_insights, refined_user_input_by_rag)
     elif operation == "generate_report":
         print("Generating PDF report...")
-        safe_execute(data_analysis_report.generate_pdf_report, user_input)
+        safe_execute(data_analysis_report.generate_pdf_report, refined_user_input_by_rag)
     elif operation == "create_dashboard":
         print("Creating dashboard...")
-        safe_execute(dashboard.create_dashboard, user_input)
+        safe_execute(dashboard.create_dashboard, refined_user_input_by_rag)
     elif operation == "build_model":
         print("Building ML model...")
-        safe_execute(ML.build_model_and_test, user_input)
+        safe_execute(ML.build_model_and_test, refined_user_input_by_rag)
     elif operation == "test_model":
         print("Testing ML model...")
-        safe_execute(ML.build_model_and_test, user_input)
+        safe_execute(ML.build_model_and_test, refined_user_input_by_rag)
     elif operation == "deploy_model":
         print("Deploying ML model...")
-        safe_execute(ML.deploy_model, user_input)
+        safe_execute(ML.deploy_model, refined_user_input_by_rag)
     elif operation == "predict_custom_input":
         print("Predicting custom input...")
-        safe_execute(ML.predict_custom_input, user_input)
+        safe_execute(ML.predict_custom_input, refined_user_input_by_rag)
     elif operation == "os_operations":
         print("Performing OS operations...")
-        safe_execute(OS_Operation, user_input)
+        safe_execute(OS_Operation, refined_user_input_by_rag)
     else:
         print("Unable to determine the operation. Please try again.")
 
