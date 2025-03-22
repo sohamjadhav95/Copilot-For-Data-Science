@@ -1,15 +1,1 @@
 "No Command"
-
-Please provide the data so I can show the relation between age and salary.
-show me the dataset on age and salary
-first 5 rows of the age and salary dataset
-show relation in experience vs salary
-Show the relation between experience and salary in a visual format.
-"When visualizing the relation between experience and salary, keep the salary values on the y-axis as they are in the dataset and do not encode them in a range."
-show a bar plot of the relationship between experience and salary
-Show a scatter plot of the relationship between experience and salary
-make a pie plot of experience vs salary
-Which features have the most impact on salary?
-Show a visualization of the features that have the most impact on salary.
-Create a machine learning model to predict salary based on experience and the features that have the most impact on salary.
-deploy the machine learning model to predict salary based on experience and the features that have the most impact on salary

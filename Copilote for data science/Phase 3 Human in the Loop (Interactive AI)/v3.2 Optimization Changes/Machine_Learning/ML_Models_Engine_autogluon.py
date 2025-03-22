@@ -14,7 +14,6 @@ from sklearn.cluster import KMeans
 from kneed import KneeLocator  # Import for automatic knee detection
 from pycaret.clustering import *
 from sklearn.preprocessing import LabelEncoder
-from flaml import AutoML
 
 import sys
 sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.2 Optimization Changes\Core_Automation_Engine")
@@ -101,9 +100,9 @@ class SupervisedUniversalMachineLearning:
             
     #======================================================================================
 
-    def build_model_and_test(self, user_input):
+    def build_model_and_test(self, user_input, time_limit=720):
         """
-        Trains an ML model using AutoGluon (max 12 min). If it fails, falls back to FLAML.
+        Trains an ML model using AutoGluon if it does not exist and always performs testing.
         """
         if task_type(user_input) == "Clustering":
             USL = UnsupervisedMachineLearning()
@@ -116,6 +115,8 @@ class SupervisedUniversalMachineLearning:
             MODEL_DIR = f"./autogluon_model_{target_column}"
             LABEL_COLUMN = target_column
             ENCODER_PATH = os.path.join(MODEL_DIR, "label_encoder.pkl")
+
+            # Load dataset
             task = task_type(user_input)
             print(f"Task Type: {task}")
             df = pd.read_csv(DATA_PATH)
@@ -125,31 +126,24 @@ class SupervisedUniversalMachineLearning:
             if os.path.exists(MODEL_DIR):
                 print(f"Model found at {MODEL_DIR}. Skipping training and proceeding with testing.")
                 predictor = TabularPredictor.load(MODEL_DIR)
+
+                # Load label encoder if applicable
+                if os.path.exists(ENCODER_PATH):
+                    label_encoder = joblib.load(ENCODER_PATH)
+                    if df[LABEL_COLUMN].dtype == 'object':
+                        df[LABEL_COLUMN] = label_encoder.transform(df[LABEL_COLUMN])
             else:
-                print(f"Training new model and saving to {MODEL_DIR}.")
+                print(f"Training new model (time limit: 12 minutes) and saving to {MODEL_DIR}.")
                 os.makedirs(MODEL_DIR, exist_ok=True)
 
                 # Encode categorical target variable if needed
                 if df[LABEL_COLUMN].dtype == 'object':
                     label_encoder = LabelEncoder()
                     df[LABEL_COLUMN] = label_encoder.fit_transform(df[LABEL_COLUMN])
-                    joblib.dump(label_encoder, ENCODER_PATH)
+                    joblib.dump(label_encoder, ENCODER_PATH)  # ✅ Save encoder
 
-                # Start AutoGluon with a timer
-                start_time = time.time()
-                try:
-                    predictor = TabularPredictor(label=LABEL_COLUMN, path=MODEL_DIR).fit(df, time_limit=720)  # 12 min limit
-                except Exception as e:
-                    print(f"AutoGluon failed: {e}. Switching to FLAML.")
-                    predictor = None
-
-                if time.time() - start_time >= 720 or predictor is None:
-                    print("AutoGluon exceeded time limit or failed. Using FLAML instead.")
-                    automl = AutoML()
-                    X_train = df.drop(columns=[LABEL_COLUMN])
-                    y_train = df[LABEL_COLUMN]
-                    automl.fit(X_train, y_train, task="regression", time_budget=300)  # 5 min limit
-                    predictor = automl  # Assign FLAML model
+                # Train Model with a 12-minute time limit
+                predictor = TabularPredictor(label=LABEL_COLUMN, path=MODEL_DIR).fit(df, time_limit=720)
 
             # Perform Testing (Always)
             X_test = df.drop(columns=[LABEL_COLUMN])
@@ -160,9 +154,11 @@ class SupervisedUniversalMachineLearning:
             if df[LABEL_COLUMN].dtype in [np.float64, np.int64]:  # Regression Task
                 r2 = r2_score(y_actual, y_pred)
                 mape = mean_absolute_percentage_error(y_actual, y_pred)
-                accuracy = 100 * (1 - mape)
+                accuracy = 100 * (1 - mape)  # Interpreted accuracy for regression
+
                 print(f"R² Score: {r2 * 100:.2f}%")
                 print(f"Accuracy (based on MAPE): {accuracy:.2f}%")
+
             else:  # Classification Task
                 accuracy = accuracy_score(y_actual, y_pred)
                 print(f"Classification Accuracy: {accuracy * 100:.2f}%")
