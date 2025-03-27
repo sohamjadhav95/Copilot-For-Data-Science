@@ -10,7 +10,7 @@ CSV_FILE = r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phas
 if os.path.exists(CSV_FILE):
     with open(CSV_FILE, mode='w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(["'No Command'"])
+        writer.writerow(["No Command"])
 
 
 

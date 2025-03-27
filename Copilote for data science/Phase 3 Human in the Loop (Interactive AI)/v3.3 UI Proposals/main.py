@@ -1,6 +1,5 @@
 import sys
 sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.3 UI Proposals\Machine_Learning")
-sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.3 UI Proposals\System_OS_Operations")
 sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.3 UI Proposals\Core_Automation_Engine")
 sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.3 UI Proposals\Retrival_Agumented_Generation")
 
@@ -16,7 +15,6 @@ import time
 import traceback
 from groq import Groq
 from ML_Models_Engine_autogluon import *
-from Exucution_Engine import *
 
 client = Groq(api_key="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")
 
