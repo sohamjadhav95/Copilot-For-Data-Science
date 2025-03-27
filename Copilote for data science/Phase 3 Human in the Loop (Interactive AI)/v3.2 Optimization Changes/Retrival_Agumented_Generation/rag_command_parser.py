@@ -1,10 +1,18 @@
 import csv
 from groq import Groq
 import pandas as pd
+import os
 
 client = Groq(api_key="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")
 
 CSV_FILE = r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.2 Optimization Changes\Retrival_Agumented_Generation\commands_database.csv"
+
+if os.path.exists(CSV_FILE):
+    with open(CSV_FILE, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["'No Command'"])
+
+
 
 def store_command(command):
     """Append the command to the CSV file."""
