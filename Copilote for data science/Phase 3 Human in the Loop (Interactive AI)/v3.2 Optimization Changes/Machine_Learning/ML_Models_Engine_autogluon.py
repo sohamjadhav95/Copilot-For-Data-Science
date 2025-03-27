@@ -22,7 +22,7 @@ from Data import filepath
 
 client = Groq(api_key="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")
 
-def task_type(self):
+def task_type(user_input):
     """
     Determines the machine learning task type based on the dataset and user input.
     Returns: 'Regression', 'Binary Classification', 'Multiclass Classification', or 'Clustering'
@@ -33,6 +33,7 @@ def task_type(self):
     # Create prompt for Groq API
     prompt = (
         f"Determine the machine learning task type based on this information:\n"
+        f"User Input: {user_input}\n"
         f"Data types: {dtype}\n"
         f"Sample dataset: {df.head(100)}\n\n"
         f"Choose ONLY ONE from these options:\n"
@@ -54,14 +55,21 @@ def task_type(self):
         stop=None,
     )
     task = completion.choices[0].message.content.strip()
-    print(f"Task type: {task}")
+    print(f"Task type Determined From Dataset: {task}")
     
     # Validate response
-    valid_tasks = ['Regression', 'Binary Classification', 'Multiclass Classification', 'Clustering']
-    if task not in valid_tasks:
+    # valid_tasks = ['Regression', 'Binary Classification', 'Multiclass Classification', 'Clustering']
+    
+    if "Regression" in task:
+        return "Regression"
+    elif "Binary Classification" in task:
+        return "Binary Classification"
+    elif "Multiclass Classification" in task:
+        return "Multiclass Classification"
+    elif "Clustering" in task:
+        return "Clustering"
+    else:
         raise ValueError(f"Invalid task type received: {task}")
-        
-    return task
 
 class SupervisedUniversalMachineLearning:
     def targeted_column(self, user_input):
@@ -118,7 +126,7 @@ class SupervisedUniversalMachineLearning:
 
             # Load dataset
             task = task_type(user_input)
-            print(f"Task Type: {task}")
+            print(f"Task Type for Supervised: {task}")
             df = pd.read_csv(DATA_PATH)
             print(f"Dataset:\n{df.head()}")
 

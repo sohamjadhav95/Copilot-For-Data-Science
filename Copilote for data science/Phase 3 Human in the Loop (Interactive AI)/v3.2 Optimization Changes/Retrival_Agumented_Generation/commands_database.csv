@@ -1,38 +1,5 @@
 "No Command"
-Show me the first 10 rows of the dataset.
-Show me the first 10 rows of the dataset.
-Show me the first 10 rows of the dataset.
-Show me the first 10 rows of the dataset.
-Show me the first 10 rows of the dataset.
-Show me the first 10 rows of the dataset.
-Show me the first 10 rows of the dataset.
-Show me the first 10 rows of the dataset.
-Show me the first 10 rows of the dataset.
-Show me the first 10 rows of the dataset.
-Show me the first 10 rows of the dataset.
-Show me the first 10 rows of the dataset.
-last 5 rows of the dataset
-"Display the maximum salary from the dataset, grouped by experience level."
-Show me the first 10 rows of the dataset.
-"Display the maximum salary from the dataset, grouped by seniority."
-"Display the maximum salary from the dataset, grouped by seniority."
-"Display the maximum salary from the dataset, grouped by seniority."
-"show the top 5 maximum salaries, grouped by seniority, with job title"
-Show me the first 10 rows of the dataset.
-Show the first 10 rows of the dataset.
-Show the first 10 rows of the dataset.
-Show the first 10 rows of the dataset.
-Show the first 10 rows of the dataset.
-Show the middle 10 rows of the dataset.
-sort the middle 10 rows of the dataset by salary from low to high
-Show the first 10 rows of the dataset.
-Show the dataset before sorting the middle 10 rows by salary.
-Show the first 10 rows of the dataset.
-Show the first 10 rows of the dataset.
-max salary in the dataset
-show last 10 rows of the dataset
-show salary and position for each employee in the dataset
-visualize salary and position for each employee
-visualize salary and position for each employee
-visualize salary and position for each employee
-visualize salary and position for each employee
+Perform Clustering ML operation on the dataset
+Create a clustering ML model
+Create a regression ML model
+Create a classification ML model for predictions
