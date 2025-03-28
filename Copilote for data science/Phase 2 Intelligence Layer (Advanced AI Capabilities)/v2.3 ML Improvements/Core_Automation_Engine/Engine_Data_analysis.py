@@ -367,4 +367,4 @@ class DataAnalysisReport:
 
 if __name__ == "__main__":
     report = Dashboard()
-    report.create_dashboard(" create any dashboard ")
+    report.create_dashboard("create any dashboard ")

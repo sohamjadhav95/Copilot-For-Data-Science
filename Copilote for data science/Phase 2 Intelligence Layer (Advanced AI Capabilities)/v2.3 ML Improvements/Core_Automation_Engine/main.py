@@ -49,9 +49,6 @@ def execute_multiple_commands(user_input):
                 print("Creating dashboard...")
                 dashboard = Dashboard()
                 dashboard.create_dashboard(user_input)
-            elif operation == "os_operations":
-                print("Performing OS operations...")
-                system_operation(user_input)
             elif operation == "build_model":
                 print("Building ML model...")
                 build_model(user_input)
@@ -61,7 +58,9 @@ def execute_multiple_commands(user_input):
             elif operation == "deploy_model":
                 print("Deploying ML model...")
                 deploy_model(user_input)
-
+            elif operation == "os_operations":
+                print("Performing OS operations...")
+                system_operation(user_input)
             else:
                 print("Unable to determine the operation. Please try again.")
 
@@ -98,9 +97,6 @@ def main():
             elif operation == "create_dashboard":
                 print("Creating dashboard...")
                 dashboard.create_dashboard(user_input)
-            elif operation == "os_operations":
-                print("Performing OS operations...")
-                system_operation(user_input)
             elif operation == "build_model":
                 print("Building ML model...")
                 build_model(user_input)
@@ -110,6 +106,9 @@ def main():
             elif operation == "deploy_model":
                 print("Deploying ML model...")
                 deploy_model(user_input)
+            elif operation == "os_operations":
+                print("Performing OS operations...")
+                system_operation(user_input)
             else:
                 print("Unable to determine the operation. Please try again.")
 
