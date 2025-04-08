@@ -195,7 +195,7 @@ class MessageBubble(ctk.CTkFrame):
             kwargs["fg_color"] = "#e3f2fd"  # Light blue for user
             text_color = "#303f9f"
         elif sender == "System":
-            kwargs["fg_color"] = "#fff8e1"  # Light amber for system messages
+            kwargs["fg_color"] = "#faf9f6"  # Light amber for system messages
             text_color = "#ff6f00"
         else:
             kwargs["fg_color"] = "#f1f8e9"  # Light green for assistant
@@ -530,7 +530,7 @@ class DataScienceCopilotApp(TkinterDnD.Tk):
         if sender == "You":
             bg_color = "#e3f2fd"  # Light blue for user
         elif sender == "System":
-            bg_color = "#fff8e1"  # Light amber for system messages
+            bg_color = "#faf9f6"  # Light amber for system messages
         else:
             bg_color = "#f1f8e9"  # Light green for assistant
             

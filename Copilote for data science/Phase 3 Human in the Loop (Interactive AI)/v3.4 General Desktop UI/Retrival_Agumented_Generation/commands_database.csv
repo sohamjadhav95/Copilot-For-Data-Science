@@ -1,2 +1,9 @@
 'No Command'
-Show me the first 10 rows of the dataset
+Please provide the context (previous commands) so I can refine the current command.
+Show me the first 5 rows of the dataset
+List the names of the columns in the dataset.
+describe the columns in the dataset one by one
+Generate a report describing the columns in the dataset.
+"It seems like the user might have made a typo. 
+
+Could you please clarify what you meant by ""serte""?  Perhaps you meant to say something related to the dataset, like ""sort the dataset"" or ""search the dataset""?"

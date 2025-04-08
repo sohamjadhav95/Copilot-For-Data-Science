@@ -9,6 +9,7 @@ from NL_processor import result_response
 client = Groq(api_key="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")  # Replace with your Groq API key
 
 def Groq_Input(user_input):
+    '''
     sql_executor = SQLExecutor()
     first_100_rows, last_100_rows = Data_rows()
     data = filepath()
@@ -42,9 +43,9 @@ def Groq_Input(user_input):
         result, success = sql_executor.execute_sql(sql_query)
         if success:
             print(result)
-            result_response(user_input, result)
+            #result_response(user_input, result)
             return
-    
+    '''
     # Fallback to code generation
     original_code_generation_approach(user_input)
 
@@ -59,7 +60,7 @@ def original_code_generation_approach(user_input):
 
         prompt = (
             f"See this dataset's First and Last 100 rows you have provided: {first_100_rows}, {last_100_rows}\n"
-            f"Based on that For Whole Dataset Generate Python code to Display: {user_input}.\n"
+            f"Based on that For Whole Dataset only Generate Python code to: {user_input}.\n"
             f"Take this csv file: {data} as input for data in your code.\n"
             f"Make sure that only 'Display' operation is complete by referring the dataset.\n"
         )
@@ -89,7 +90,7 @@ def original_code_generation_approach(user_input):
             print("\nExecuting the Display Operation...\n")
             exec(generated_code)
             print("\nTask completed successfully!")
-            result_response(user_input, generated_code)
+            #result_response(user_input, generated_code)
         except Exception as e:
             print("\nAn error occurred while executing the Display Operation:")
             print(e)
@@ -110,7 +111,7 @@ def generate_code_error_handling(user_input, generated_code, e):
 
         prompt = (
             f"See the error in this generated code: {generated_code}\n error: {e}\n"
-            f"Solve this error and regenerate the code and make sure it works.\n"
+            f"Solve this error and regenerate the only code and make sure it works.\n"
             f"Refer the dataset again for reference: {first_100_rows}, {last_100_rows}\n"
             f"Take this csv file: {data} as input for data in your code.\n"
         )
