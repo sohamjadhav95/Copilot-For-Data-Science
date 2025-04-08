@@ -38,3 +38,7 @@ traceback>=0.1.0
 
 # Additional Libraries
 fpdf>=2.0.0
+
+# UI Libraries
+customtkinter>=5.2.0
+tkinterdnd2>=0.3.0

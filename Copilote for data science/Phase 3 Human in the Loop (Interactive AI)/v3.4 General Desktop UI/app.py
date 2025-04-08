@@ -10,6 +10,7 @@ import customtkinter as ctk
 from PIL import Image, ImageTk
 import json
 import time
+from tkinterdnd2 import DND_FILES, TkinterDnD
 
 # Set appearance mode and default color theme
 ctk.set_appearance_mode("System")  # "System", "Dark", "Light"
@@ -30,6 +31,7 @@ try:
     from rag_command_parser import basic_rag
     from ML_Models_Engine_autogluon import SupervisedUniversalMachineLearning
     from groq import Groq
+    from Data import update_data_path, import_data
 except ImportError as e:
     print(f"Import Error: {e}. Please check that all required modules are installed and paths are correct.")
     ctk.CTk().withdraw()  # Prevent empty window
@@ -41,7 +43,6 @@ except ImportError as e:
 api_key = "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"
 client = Groq(api_key=api_key)
 
-data_file = r"C:\Users\soham\Downloads\California Wildfire Damage.csv"
 
 # Initialize ML model and other objects
 ML = SupervisedUniversalMachineLearning()
@@ -149,12 +150,7 @@ def route_command(operation, user_input):
         func_output, func_error = safe_execute(ML.predict_custom_input, refined_user_input_by_rag)
     elif operation == "os_operations":
         operation_output += "Performing OS operations...\n"
-        try:
-            from OS_operations import OS_Operation
-            func_output, func_error = safe_execute(OS_Operation, refined_user_input_by_rag)
-        except ImportError:
-            func_output = ""
-            func_error = "OS_operations module not found."
+
     else:
         operation_output += "Unable to determine the operation. Please try again.\n"
         func_output = ""
@@ -239,7 +235,7 @@ class PromptButton(ctk.CTkButton):
                         fg_color="#2979ff", hover_color="#1565c0",
                         corner_radius=8, **kwargs)
 
-class DataScienceCopilotApp(ctk.CTk):
+class DataScienceCopilotApp(TkinterDnD.Tk):
     def __init__(self):
         super().__init__()
         
@@ -314,6 +310,9 @@ class DataScienceCopilotApp(ctk.CTk):
             title_label = ctk.CTkLabel(logo_frame, text="Data Science Copilot",
                                     font=ctk.CTkFont(family="Segoe UI", size=18, weight="bold"))
             title_label.pack(side="left", padx=10)
+        
+        # Create file drop zone
+        self.create_file_drop_zone()
         
         # Create scrollable frame for command categories
         self.sidebar_scroll = SmoothScrollableFrame(self.sidebar, fg_color="transparent")
@@ -657,6 +656,49 @@ class DataScienceCopilotApp(ctk.CTk):
                 self.add_message(sender, message)
         else:
             print("No chat history file found.")
+
+    def create_file_drop_zone(self):
+        """Create a file drop zone in the sidebar"""
+        drop_zone = ctk.CTkFrame(self.sidebar, fg_color=("gray85", "gray20"), corner_radius=10)
+        drop_zone.pack(fill="x", padx=10, pady=10)
+        
+        # Drop zone label
+        label = ctk.CTkLabel(drop_zone, 
+                           text="📁 Drop CSV file here\nor click to select",
+                           font=ctk.CTkFont(family="Segoe UI", size=12),
+                           text_color=("gray30", "gray70"))
+        label.pack(padx=20, pady=20)
+        
+        # Make the frame droppable
+        drop_zone.drop_target_register(DND_FILES)
+        drop_zone.dnd_bind('<<Drop>>', self.on_drop)
+        
+        # Bind click event to open file dialog
+        drop_zone.bind('<Button-1>', self.on_click_select_file)
+        
+    def on_drop(self, event):
+        """Handle file drop event"""
+        # Get the dropped file path
+        file_path = event.data.strip('{}')
+        
+        # Handle multiple files (take the first one)
+        if '\n' in file_path:
+            file_path = file_path.split('\n')[0]
+            
+        # Import the data
+        success, message = import_data(file_path)
+        self.add_message("System", message)
+            
+    def on_click_select_file(self, event):
+        """Handle click event to open file dialog"""
+        file_path = ctk.filedialog.askopenfilename(
+            title="Select CSV file",
+            filetypes=[("CSV files", "*.csv"), ("All files", "*.*")]
+        )
+        
+        if file_path:
+            success, message = import_data(file_path)
+            self.add_message("System", message)
 
     def main(self):
         # Load chat history on startup
