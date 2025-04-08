@@ -41,6 +41,7 @@ except ImportError as e:
 api_key = "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"
 client = Groq(api_key=api_key)
 
+data_file = r"C:\Users\soham\Downloads\California Wildfire Damage.csv"
 
 # Initialize ML model and other objects
 ML = SupervisedUniversalMachineLearning()
