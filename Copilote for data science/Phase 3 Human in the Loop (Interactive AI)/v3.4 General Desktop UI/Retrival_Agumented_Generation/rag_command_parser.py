@@ -5,7 +5,7 @@ import os
 
 client = Groq(api_key="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")
 
-CSV_FILE = r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.3 UI Proposals\Retrival_Agumented_Generation\commands_database.csv"
+CSV_FILE = r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.4 General Desktop UI\Retrival_Agumented_Generation\commands_database.csv"
 
 if os.path.exists(CSV_FILE):
     with open(CSV_FILE, mode='w', newline='') as file:
