@@ -1,9 +1,14 @@
 'No Command'
-Please provide the context (previous commands) so I can refine the current command.
-Show me the first 5 rows of the dataset
-List the names of the columns in the dataset.
-describe the columns in the dataset one by one
-Generate a report describing the columns in the dataset.
-"It seems like the user might have made a typo. 
-
-Could you please clarify what you meant by ""serte""?  Perhaps you meant to say something related to the dataset, like ""sort the dataset"" or ""search the dataset""?"
+Please provide the context from the previous commands.
+Please provide the context from which to show the maximum injuries and their dates.
+Show first 10 rows of the data about maximum injuries and their dates.
+Show me the first 5 rows of the data about maximum injuries and their dates.
+Visualize the maximum injuries and their dates
+Filter the data to only include rows where the 'injuries' column is equal to 100.
+Show the dataset of maximum injuries and their dates.
+Show the 5th column of the dataset of maximum injuries and their dates.
+Show the 5th column of the dataset containing maximum injuries and their dates.
+Show the 6th column of the dataset containing maximum injuries and their dates.
+Show the 6th column of the dataset with the maximum injuries and their dates.
+Show the 5th and 6th columns of the dataset with the maximum injuries and their dates.
+Create a bar chart of the 5th and 6th columns of the dataset with the maximum injuries and their dates.
