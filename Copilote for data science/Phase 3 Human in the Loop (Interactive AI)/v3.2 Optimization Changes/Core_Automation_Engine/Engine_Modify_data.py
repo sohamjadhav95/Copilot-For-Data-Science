@@ -7,7 +7,7 @@ from SQL_Operations import SQLExecutor
 from NL_processor import result_response
 
 # Configure the Groq API with your API key
-client = Groq(api_key="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")
+client = Groq(api_key="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")
 
 first_100_rows, last_100_rows = Data_rows()
 data = filepath()
@@ -44,7 +44,7 @@ def Groq_Input(user_input):
         f"Take this csv file: {data} as input for data in your code."
     )
     completion = client.chat.completions.create(
-        model= "qwen-2.5-coder-32b",
+        model= "deepseek-r1-distill-llama-70b",
         messages=[{"role": "user", "content": sql_prompt}],
         temperature=0.4,
         max_tokens=1024
@@ -91,7 +91,7 @@ def original_code_generation_approach(user_input):
         )
 
         completion = client.chat.completions.create(
-            model="qwen-2.5-coder-32b",
+            model="deepseek-r1-distill-llama-70b",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.6,
             max_tokens=4096,

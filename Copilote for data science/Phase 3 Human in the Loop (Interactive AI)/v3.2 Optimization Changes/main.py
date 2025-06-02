@@ -1,6 +1,5 @@
 import sys
 sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.2 Optimization Changes\Machine_Learning")
-sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.2 Optimization Changes\System_OS_Operations")
 sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.2 Optimization Changes\Core_Automation_Engine")
 sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.2 Optimization Changes\Retrival_Agumented_Generation")
 
@@ -16,9 +15,8 @@ import time
 import traceback
 from groq import Groq
 from ML_Models_Engine_autogluon import *
-from Exucution_Engine import *
 
-client = Groq(api_key="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")
+client = Groq(api_key="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")
 
 ML = SupervisedUniversalMachineLearning()
 
@@ -127,9 +125,6 @@ def route_command(operation, user_input):
     elif operation == "predict_custom_input":
         print("Predicting custom input...")
         safe_execute(ML.predict_custom_input, refined_user_input_by_rag)
-    elif operation == "os_operations":
-        print("Performing OS operations...")
-        safe_execute(OS_Operation, refined_user_input_by_rag)
     else:
         print("Unable to determine the operation. Please try again.")
 

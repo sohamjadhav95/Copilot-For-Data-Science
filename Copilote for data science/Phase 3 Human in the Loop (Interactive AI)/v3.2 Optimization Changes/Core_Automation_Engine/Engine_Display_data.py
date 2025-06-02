@@ -6,46 +6,10 @@ from SQL_Operations import SQLExecutor
 from NL_processor import result_response
 
 # Configure the Groq API with your API key
-client = Groq(api_key="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")  # Replace with your Groq API key
+client = Groq(api_key="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")  # Replace with your Groq API key
+
 
 def Groq_Input(user_input):
-    sql_executor = SQLExecutor()
-    first_100_rows, last_100_rows = Data_rows()
-    data = filepath()
-    
-    # First try SQL approach
-    sql_prompt = (
-        f"Refer this dataset: {first_100_rows}, {last_100_rows}\n"
-        f"Take this csv file: {data} as input for data in your code.\n"
-        f"Convert this request to SQL query: {user_input}. Respond ONLY with SQL code."
-    )
-
-    completion = client.chat.completions.create(
-        model= "qwen-2.5-coder-32b",
-        messages=[{"role": "user", "content": sql_prompt}],
-        temperature=0.4,
-        max_tokens=1024
-    )
-    sql_query = completion.choices[0].message.content
-    
-    if sql_query:
-        # Extract SQL code from markdown block
-        sql_match = re.search(r"```sql\n(.*?)\n```", sql_query, re.DOTALL)
-        if sql_match:
-            sql_query = sql_match.group(1).strip()
-        else:
-            # Check for generic code block
-            code_match = re.search(r"```\n(.*?)\n```", sql_query, re.DOTALL)
-            if code_match:
-                sql_query = code_match.group(1).strip()
-        
-        result, success = sql_executor.execute_sql(sql_query)
-        if success:
-            print(result)
-            result_response(user_input, result)
-            return
-    
-    # Fallback to code generation
     original_code_generation_approach(user_input)
 
 
@@ -65,7 +29,7 @@ def original_code_generation_approach(user_input):
         )
 
         completion = client.chat.completions.create(
-            model="qwen-2.5-coder-32b",
+            model="deepseek-r1-distill-llama-70b",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.6,
             max_tokens=4096,

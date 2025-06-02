@@ -3,7 +3,7 @@ from groq import Groq
 from Data import dataset_features
 
 # Configure the Groq API with your API key
-client = Groq(api_key="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")  # Replace with your Groq API key
+client = Groq(api_key="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")  # Replace with your Groq API key
 
 def NL_processor(user_input):
     try:
@@ -22,7 +22,6 @@ def NL_processor(user_input):
         - 'analyze' → Performing data analysis.
         - 'report' → Generating a data report.
         - 'dashboard' → Creating a dashboard.
-        5. **OS Operations**: If the input is for any OS operations or other general operations related to system.
 
         User Input: "{user_input}"
 
@@ -40,7 +39,6 @@ def NL_processor(user_input):
         - 'analyze_data' (for data analysis)
         - 'generate_report' (for report generation)
         - 'create_dashboard' (for dashboard creation)
-        - 'os_operations' (for any OS operations or other general operations related to system)
         """
 
         completion = client.chat.completions.create(
@@ -79,8 +77,6 @@ def NL_processor(user_input):
             return "generate_report"
         elif "create_dashboard" in response:
             return "create_dashboard"
-        elif "os_operations" in response:
-            return "os_operations"
         else:
             return None
     except Exception as e:
@@ -134,7 +130,7 @@ def result_response(user_input ,result):
     )
 
     completion = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
+        model="gemma2-9b-it",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.4,
         max_tokens=1024,
@@ -158,7 +154,7 @@ def genral_response_chatbot(user_input):
     )
 
     completion = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="deepseek-r1-distill-llama-70b",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.8,
         max_tokens=1024,

@@ -5,7 +5,7 @@ from Data import Data_rows, filepath
 from NL_processor import result_response
 
 # Configure the Groq API with your API key
-client = Groq(api_key="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")  # Replace with your Groq API key
+client = Groq(api_key="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")  # Replace with your Groq API key
 
 def Groq_Input(user_input):
     try:
@@ -23,7 +23,7 @@ def Groq_Input(user_input):
         )
 
         completion = client.chat.completions.create(
-            model="qwen-2.5-coder-32b",
+            model="deepseek-r1-distill-llama-70b",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.6,
             max_tokens=4096,

@@ -20,7 +20,7 @@ sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science
 from Data import filepath
 
 
-client = Groq(api_key="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")
+client = Groq(api_key="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")
 
 def task_type(user_input):
     """
@@ -46,7 +46,7 @@ def task_type(user_input):
     
 
     completion = client.chat.completions.create(
-        model="qwen-2.5-32b",
+        model="deepseek-r1-distill-llama-70b",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.2,
         max_tokens=50,
@@ -85,7 +85,7 @@ class SupervisedUniversalMachineLearning:
 
         try:
             completion = client.chat.completions.create(
-                model="qwen-2.5-32b",
+                model="deepseek-r1-distill-llama-70b",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.4,
                 max_tokens=1024,

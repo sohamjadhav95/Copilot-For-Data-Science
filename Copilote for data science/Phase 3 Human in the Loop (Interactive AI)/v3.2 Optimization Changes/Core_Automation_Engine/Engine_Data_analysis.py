@@ -14,7 +14,7 @@ from fpdf import FPDF
 import json
 import re
 
-client = Groq(api_key="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")  # Replace with your Groq API key
+client = Groq(api_key="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")  # Replace with your Groq API key
 
 
 def load_and_preprocess_data():
