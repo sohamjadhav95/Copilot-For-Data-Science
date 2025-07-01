@@ -28,47 +28,6 @@ def undo_last_change():
         print("No backup found! Cannot undo.")
 
 def Groq_Input(user_input):
-    sql_executor = SQLExecutor()
-    first_100_rows, last_100_rows = Data_rows()
-
-    # Create backup before applying modifications
-    create_backup()
-    
-    data = filepath()
-
-    # First try SQL approach
-    sql_prompt = (
-        f"Refer this dataset: {first_100_rows}, {last_100_rows}\n"
-        f"Convert this modification request to SQL: {user_input}. "
-        "Use UPDATE, INSERT, or DELETE statements. Respond ONLY with SQL code."
-        f"Take this csv file: {data} as input for data in your code."
-    )
-    completion = client.chat.completions.create(
-        model= "deepseek-r1-distill-llama-70b",
-        messages=[{"role": "user", "content": sql_prompt}],
-        temperature=0.4,
-        max_tokens=1024
-    )
-    sql_query = completion.choices[0].message.content
-    
-    if sql_query:
-        # Extract SQL from markdown block
-        sql_match = re.search(r"```sql\n(.*?)\n```", sql_query, re.DOTALL)
-        if sql_match:
-            sql_query = sql_match.group(1).strip()
-        else:
-            code_match = re.search(r"```\n(.*?)\n```", sql_query, re.DOTALL)
-            if code_match:
-                sql_query = code_match.group(1).strip()
-        
-        _, success = sql_executor.execute_sql(sql_query)
-        if success:
-            sql_executor.save_changes()
-            print("Modification successful via SQL!")
-            result_response(user_input, sql_query)
-            return
-    
-    # Fallback to code generation
     original_code_generation_approach(user_input)
 
 
