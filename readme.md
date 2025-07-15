@@ -62,7 +62,7 @@ Machine Learning:
 - Deploy the model and predict custom input
 
 ### Directory Structure
-
+'''
 Copilot-For-Data-Science/
 ├── main.py
 |
@@ -83,7 +83,7 @@ Copilot-For-Data-Science/
 |
 ├── requirements.txt
 └── README.md
-
+'''
 ### Contributing
 Contributions are welcome! Please follow these guidelines:
 
