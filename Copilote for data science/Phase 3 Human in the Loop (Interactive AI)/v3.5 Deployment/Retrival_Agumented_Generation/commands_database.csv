@@ -1,10 +1,10 @@
 Command
-""""""
-show first 10 rows
-Visualize winner rank vs loser rank
-remove all rows with null values
-show first 10 rows
-show all rows
-show all rows
-show all rows
-show all rows
+Show first 10 rows of dataset
+delete row where winner rank is not null
+show rows where winner rank is not null
+show first 10 rows of dataset
+delete row where winner rank is not null
+show first 10 rows of dataset
+delete row where tournament name is not null
+show first 10 rows of dataset
+show first 10 rows of dataset
