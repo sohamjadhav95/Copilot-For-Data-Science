@@ -31,7 +31,7 @@ cd Copilot-For-Data-Science
 
 ### Option 2: Download ZIP (Latest Version)
 
-* [📥 Download Latest Release via Google Drive](https://drive.google.com/your-link-here)
+* [📥 Download Latest Release via Google Drive]([https://drive.google.com/your-link-here](https://drive.google.com/drive/folders/1iv-jRfSXg-UgUjch_kZN95Nm4ARTqDon?usp=sharing))
 * Unzip the folder to a directory of your choice
 
 ---
