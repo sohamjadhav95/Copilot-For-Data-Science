@@ -1,0 +1,13 @@
+streamlit
+pandas
+matplotlib
+seaborn
+plotly
+groq
+fpdf
+scikit-learn
+autogluon
+pycaret
+tpot
+kneed
+joblib 

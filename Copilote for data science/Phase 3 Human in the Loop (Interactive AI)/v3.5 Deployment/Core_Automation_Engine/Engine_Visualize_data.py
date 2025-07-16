@@ -2,18 +2,12 @@ import re
 from groq import Groq
 import pandas as pd
 from Data import Data_rows, filepath
-from SQL_Operations import SQLExecutor
 from NL_processor import result_response
 
 # Configure the Groq API with your API key
 client = Groq(api_key="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")  # Replace with your Groq API key
 
-
 def Groq_Input(user_input):
-    original_code_generation_approach(user_input)
-
-
-def original_code_generation_approach(user_input):
     try:
         first_100_rows, last_100_rows = Data_rows()
         data = filepath()
@@ -23,9 +17,9 @@ def original_code_generation_approach(user_input):
 
         prompt = (
             f"See this dataset's First and Last 100 rows you have provided: {first_100_rows}, {last_100_rows}\n"
-            f"Based on that For Whole Dataset Generate Python code to Display: {user_input}.\n"
+            f"Based on that For Whole Dataset Generate Python code to Visualize: {user_input}.\n"
             f"Take this csv file: {data} as input for data in your code.\n"
-            f"Make sure that only 'Display' operation is complete by referring the dataset.\n"
+            f"Make sure that Only 'Visualization' operation is complete by referring the dataset.\n"
         )
 
         completion = client.chat.completions.create(
@@ -46,19 +40,17 @@ def original_code_generation_approach(user_input):
         if code_match:
             generated_code = code_match.group(1).strip()  # Extract the valid Python code
         else:
-            print("No valid Display Logic detected in response!")
+            print("No valid Visualization Logic detected in response!")
             return
 
         try:
-            print("\nExecuting the Display Operation...\n")
+            print("\nExecuting the Visualization Operation...\n")
             exec(generated_code)
             print("\nTask completed successfully!")
             result_response(user_input, generated_code)
         except Exception as e:
-            print("\nAn error occurred while executing the Display Operation:")
+            print("\nAn error occurred while executing the Visualization Operation Tying another method:")
             print(e)
-            
-            #Fallback to code generation
             generate_code_error_handling(user_input, generated_code, e)
     except Exception as e:
         print(f"An error occurred in Groq_Input: {e}")
@@ -97,12 +89,12 @@ def generate_code_error_handling(user_input, generated_code, e):
         if code_match:
             generated_code = code_match.group(1).strip()  # Extract the valid Python code
         else:
-            print("No valid Display Logic detected in response!")
+            print("No valid Visualization Logic detected in response!")
             return
 
         try:
-            print("\nExecuting the Display Operation...\n")
-            return exec(generated_code)
+            print("\nExecuting the Visualization Operation...\n")
+            exec(generated_code)
             print("\nTask completed successfully!")
             result_response(user_input, generated_code)
         except Exception as e:

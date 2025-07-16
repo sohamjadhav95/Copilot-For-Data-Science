@@ -16,7 +16,7 @@ from pycaret.clustering import *
 from sklearn.preprocessing import LabelEncoder
 
 import sys
-sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.3 Testing\Core_Automation_Engine")
+sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.5 Deployment\Core_Automation_Engine")
 from Data import filepath
 
 

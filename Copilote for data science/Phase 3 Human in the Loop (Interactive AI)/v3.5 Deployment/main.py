@@ -1,7 +1,7 @@
 import sys
-sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.3 Testing\Machine_Learning")
-sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.3 Testing\Core_Automation_Engine")
-sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.3 Testing\Retrival_Agumented_Generation")
+sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.5 Deployment\Machine_Learning")
+sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.5 Deployment\Core_Automation_Engine")
+sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.5 Deployment\Retrival_Agumented_Generation")
 
 from NL_processor import NL_processor, split_multi_commands
 from Engine_Display_data import Groq_Input as Display_Groq_Input

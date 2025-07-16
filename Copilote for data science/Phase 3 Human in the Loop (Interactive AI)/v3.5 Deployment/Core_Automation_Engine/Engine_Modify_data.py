@@ -1,13 +1,31 @@
+import os
+import shutil
 import re
 from groq import Groq
-import pandas as pd
 from Data import Data_rows, filepath
 from SQL_Operations import SQLExecutor
 from NL_processor import result_response
 
 # Configure the Groq API with your API key
-client = Groq(api_key="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")  # Replace with your Groq API key
+client = Groq(api_key="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")
 
+first_100_rows, last_100_rows = Data_rows()
+data = filepath()
+backup_path = data + ".backup"  # Backup file path
+
+def create_backup():
+    """Creates a backup of the dataset before modification."""
+    if os.path.exists(data):
+        shutil.copy(data, backup_path)
+    print("Backup Is Created Before Modification, Use Undo to restore changes")
+
+def undo_last_change():
+    """Restores the dataset from the last backup."""
+    if os.path.exists(backup_path):
+        shutil.copy(backup_path, data)
+        print("Undo successful: Data restored from the last backup.")
+    else:
+        print("No backup found! Cannot undo.")
 
 def Groq_Input(user_input):
     original_code_generation_approach(user_input)
@@ -22,10 +40,13 @@ def original_code_generation_approach(user_input):
             return
 
         prompt = (
-            f"See this dataset's First and Last 100 rows you have provided: {first_100_rows}, {last_100_rows}\n"
-            f"Based on that For Whole Dataset Generate Python code to Display: {user_input}.\n"
-            f"Take this csv file: {data} as input for data in your code.\n"
-            f"Make sure that only 'Display' operation is complete by referring the dataset.\n"
+            f"Dataset's first 100 rows: {first_100_rows}\nLast 100 rows: {last_100_rows}\n"
+            f"Generate Python code to modify the dataset as per: '{user_input}'\n"
+            f"Read the CSV file from this path: '{data}', make changes, and overwrite it.\n"
+            f"Ensure the code:\n"
+            f"1. Uses pandas to load/save the CSV.\n"
+            f"2. Saves changes with df.to_csv('{data}', index=False).\n"
+            f"3. Only performs modification tasks.\n"
         )
 
         completion = client.chat.completions.create(
@@ -40,28 +61,26 @@ def original_code_generation_approach(user_input):
 
         generated_code = completion.choices[0].message.content
 
-        # Find the first occurrence of a Python code block
+        # Extract Python code block
         code_match = re.search(r"```python\n(.*?)\n```", generated_code, re.DOTALL)
-
         if code_match:
-            generated_code = code_match.group(1).strip()  # Extract the valid Python code
+            generated_code = code_match.group(1).strip()
         else:
-            print("No valid Display Logic detected in response!")
+            print("No valid Modification Logic detected!")
             return
 
         try:
-            print("\nExecuting the Display Operation...\n")
-            exec(generated_code)
-            print("\nTask completed successfully!")
+            print("\nExecuting the Modification Operation...\n")
+            exec(generated_code)  # This modifies the CSV file
+            print("\nData modified and saved successfully!")
             result_response(user_input, generated_code)
         except Exception as e:
-            print("\nAn error occurred while executing the Display Operation:")
-            print(e)
-            
+            print("\nExecution Error:", e)
+
             #Fallback to code generation
             generate_code_error_handling(user_input, generated_code, e)
     except Exception as e:
-        print(f"An error occurred in Groq_Input: {e}")
+        print(f"Error in Groq_Input (Modify): {e}")
 
 
 def generate_code_error_handling(user_input, generated_code, e):
@@ -97,12 +116,12 @@ def generate_code_error_handling(user_input, generated_code, e):
         if code_match:
             generated_code = code_match.group(1).strip()  # Extract the valid Python code
         else:
-            print("No valid Display Logic detected in response!")
+            print("No valid Modification Logic detected in response!")
             return
 
         try:
-            print("\nExecuting the Display Operation...\n")
-            return exec(generated_code)
+            print("\nExecuting the Modification Operation...\n")
+            exec(generated_code)
             print("\nTask completed successfully!")
             result_response(user_input, generated_code)
         except Exception as e:
@@ -110,3 +129,4 @@ def generate_code_error_handling(user_input, generated_code, e):
             print(e)
     except Exception as e:
         print(f"An error occurred in Groq_Input: {e}")
+
