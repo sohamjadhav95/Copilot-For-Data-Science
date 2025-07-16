@@ -1,133 +1,104 @@
-
 # Copilot for Data Science
 
-## Overview
-This project, "Copilot for Data Science," aims to provide an interactive and automated platform for data analysis, visualization, and machine learning tasks. It leverages natural language processing (NLP) to interpret user commands and perform various data operations, including data display, modification, visualization, and machine learning model building and deployment.
+## 🧠 Overview
 
-## Features
-- **Natural Language Processing (NLP)**: Interpret user commands in natural language.
-- **Data Operations**: Display, modify, and visualize data.
-- **Machine Learning**: Build, test, deploy, and predict using machine learning models.
-- **Dashboard Creation**: Generate interactive dashboards for data visualization.
-- **Automated Error Handling**: Provide dynamic error explanations and solutions.
-- **Data Analysis and Reporting**: Generate insights and PDF reports from datasets.
+"Copilot for Data Science" is a powerful and interactive AI-driven automation platform that streamlines the entire data science workflow — from exploratory data analysis to model deployment — all through **natural language commands**.
 
-## Installation
+The tool interprets user input using NLP and executes dynamic operations like data visualization, cleaning, transformation, machine learning, and analysis.
 
-### Prerequisites
-- Python 3.8 or higher
-- Basic knowledge of Python and machine learning concepts
+## 🚀 Use Cases
 
-### Steps
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/yourusername/Copilot-For-Data-Science.git
-   cd Copilot-For-Data-Science
+* Quickly explore datasets by typing "show me the top 10 rows".
+* Clean and transform messy CSV files without writing code.
+* Auto-generate plots and statistical summaries.
+* Build, test, and deploy machine learning models.
+* Generate PDF reports and interactive dashboards.
+* Perform all of the above via a terminal interface — no GUI required!
 
-### Install Dependencies:
+## ⚠️ Caution
 
-pip install -r requirements.txt
+> This project runs **strictly in terminal/CLI** using Python and Rich. GUI-based services (e.g., Streamlit) are intentionally not used due to performance and flexibility constraints.
 
-### Set Up API Keys:
-Ensure you have the necessary API keys for Groq and other services.
-Place the API keys in the appropriate configuration files or environment variables.
+If you're looking for a browser-based or GUI version, it's not available in this version.
 
-### Prepare the Dataset:
-Place your dataset in the data directory.
-Update the Data.py file with the correct path to your dataset.
+## ✨ Features
 
-### Usage
-Running the Application
+* ✅ **Natural Language Processor** — Understands your commands and routes them correctly.
+* ✅ **Data Visualization & Modification** — Perform real-time data edits and visual plots.
+* ✅ **Automated Insights & Reporting** — PDF generation, summaries, and pattern analysis.
+* ✅ **Machine Learning Module** — Train, test, deploy, and interact with ML models.
+* ✅ **Error Explainability** — Dynamic, AI-generated debugging suggestions.
+* ✅ **Rich Terminal UI** — Enhanced CLI interface using `rich`.
 
-### Start the Application:
-python main.py
+## 🛠️ Installation
 
-### Interact with the Application:
-Use natural language commands to perform various operations. For example:
-- Show me the first 10 rows of the dataset
-- Visualize the main insight of data
-- Clean all null value rows from the whole dataset
-- Build a machine learning model
-- Deploy the model and predict custom input
+📥 **Download the Latest Version:**
 
-### Example Commands
-Display Data:
-- Show me the first 10 rows of the dataset
-Modify Data:
-- Clean all null value rows from the whole dataset
-Visualize Data:
-- Visualize the main insight of data
-Machine Learning:
-- Build a machine learning model
-- Deploy the model and predict custom input
+* Always use the **highest/latest version** of the project.
+* You can either:
 
-### Directory Structure
+  * Clone the GitHub repository (recommended)
+  * Or download it directly via the provided Google Drive link (mentioned in `setup.md`).
+
+📄 **View Full Setup Guide:** [setup.md →](https://github.com/sohamjadhav95/Copilot-For-Data-Science/blob/main/setup.md)
+
+Includes:
+
+* How to download the project (GitHub or Google Drive)
+* How to install dependencies
+* How to launch the project via `.bat` or terminal
+* API key configuration
+
+---
+
+## 📁 Project Directory Structure
+
 ```
 Copilot-For-Data-Science/
-├── main.py
-|
-├── Retrival_Agumented_Generation/
-|   ├── rag_command_parser.py
-|   └── commands_database.csv
-|
-├── Machine_Learning/
-|   └── ML_Models_Engine_autogluon.py
-|
-├── Core_Automation_Engine/
-|   ├── Engine_Data_analysis.py
-|   ├── Engine_Display_data.py
-|   ├── Engine_Modify_data.py
-|   ├── Engine_Visualize_data.py
-|   ├── NL_processor.py
-|   └── Data.py
-|
+├── launch_copilot.bat
+├── Launch Copilot.lnk
+├── copilot_icon.ico
 ├── requirements.txt
-└── README.md
+├── setup.md
+├── README.md
+│
+├── main.py
+├── rich_cli.py
+│
+├── Core_Automation_Engine/
+│   ├── Engine_Data_analysis.py
+│   ├── Engine_Display_data.py
+│   ├── Engine_Modify_data.py
+│   ├── Engine_Visualize_data.py
+│   ├── NL_processor.py
+│   └── Data.py
+│
+├── Machine_Learning/
+│   └── ML_Models_Engine_autogluon.py
+│
+├── Retrival_Agumented_Generation/
+│   ├── rag_command_parser.py
+│   └── commands_database.csv
+│
+└── data/
 ```
-### Contributing
-Contributions are welcome! Please follow these guidelines:
 
-Fork the repository.
-Create a new branch for your feature or bug fix.
-Commit your changes and push to your fork.
-Submit a pull request.
+## 🤝 Contributing
 
-### License
-This project is licensed under the MIT License - see the LICENSE file for details.
+Contributions are welcome! Please follow these steps:
 
-### Contact
-For any questions or issues, please contact:
-soham.ai.engineer@gmail.com or omkargadakh1272004@gmail.com
+1. Fork the repository
+2. Create a new branch (`feature/xyz` or `fix/bug123`)
+3. Commit and push your changes
+4. Open a pull request
 
-## v3.5 Deployment: Major New Features
+## 📄 License
 
-The v3.5 Deployment introduces a powerful new command-line interface (CLI) and advanced automation features for data science workflows:
+This project is licensed under the **MIT License** — see the `LICENSE` file for details.
 
-- **Rich CLI Interface**: Use `rich_cli.py` for an interactive, colorized command-line experience. Launch with `python rich_cli.py` or use the provided `copilot.bat`.
-- **Multi-Command Support**: Chain multiple commands in a single input using "then", "and", or "after" (e.g., "Show data then visualize main insight").
-- **Automated Dashboards**: Instantly generate interactive dashboards using Dash and Plotly, with smart configuration from natural language.
-- **Machine Learning Automation**: Build, test, deploy, and predict with ML models using AutoML (AutoGluon, PyCaret, TPOT, etc.).
-- **PDF Report Generation**: Automatically create PDF reports from your data analysis.
-- **Advanced Error Handling**: Dynamic, AI-powered explanations and solutions for errors encountered during operations.
-- **Enhanced Data Operations**: Display, modify, visualize, and analyze data with improved NLP and context awareness.
+## 📬 Contact
 
-### How to Use the v3.5 CLI
+For queries, suggestions, or feedback:
 
-1. **Install dependencies** (from the v3.5 Deployment folder):
-   ```bash
-   pip install -r "Copilote for data science/Phase 3 Human in the Loop (Interactive AI)/v3.5 Deployment/requirements.txt"
-   ```
-2. **Launch the CLI**:
-   - Windows: Double-click `copilot.bat` in the v3.5 Deployment folder, or run:
-     ```bash
-     python rich_cli.py
-     ```
-3. **Interact with the CLI**:
-   - Type natural language commands (single or chained):
-     - `Show me the first 10 rows of the dataset`
-     - `Visualize the main insight of data and then build a machine learning model`
-     - `Clean all null value rows then generate a PDF report`
-   - Use `exit` to quit.
-
-### Requirements
-See `Copilote for data science/Phase 3 Human in the Loop (Interactive AI)/v3.5 Deployment/requirements.txt` for the full list of dependencies.
+* 📧 **[soham.ai.engineer@gmail.com](mailto:soham.ai.engineer@gmail.com)**
+* 📧 **[omkargadakh1272004@gmail.com](mailto:omkargadakh1272004@gmail.com)**
