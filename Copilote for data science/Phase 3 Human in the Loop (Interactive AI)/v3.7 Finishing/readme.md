@@ -80,6 +80,12 @@ Copilot-For-Data-Science/
 │   ├── rag_command_parser.py
 │   └── commands_database.csv
 │
+├── config/
+│   ├── api_key.txt
+│   ├── api_manager.py
+│   ├── dataset_path.txt
+│   └── [other config files]
+│
 └── data/
 ```
 
