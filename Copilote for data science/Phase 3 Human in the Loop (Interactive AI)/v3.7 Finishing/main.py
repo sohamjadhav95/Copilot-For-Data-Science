@@ -16,10 +16,9 @@ import traceback
 from groq import Groq
 from ML_Models_Engine_autogluon import *
 from config.api_manager import get_api_key
-from config.requirements import check_and_install_requirements
+
 
 client = Groq(api_key=get_api_key())
-check_and_install_requirements()
 ML = SupervisedUniversalMachineLearning()
 
 
