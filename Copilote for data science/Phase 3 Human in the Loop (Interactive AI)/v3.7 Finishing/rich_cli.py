@@ -16,6 +16,8 @@ from NL_processor import genral_response_chatbot
 from Engine_Data_analysis import *
 from rag_command_parser import basic_rag
 from groq import Groq
+from Core_Automation_Engine.Data import get_dataset_path
+import os
 from ML_Models_Engine_autogluon import *
 from config.api_manager import get_api_key
 
@@ -128,20 +130,34 @@ def route_command(operation, user_input):
         console.print("[bold red]⚠️ Unable to determine the operation. Please try again.[/bold red]")
 
 
+
 @handle_errors
 def main():
-    console.print("[bold bright_blue]\n🚀 Copilot for Data Science is running in CLI mode! Type your commands below.[/bold bright_blue]")
+    """Main loop to receive user input and execute commands."""
+
+    # Reset dataset path each time the program runs (optional)
+    dataset_config_path = os.path.join("config", "dataset_path.txt")
+    if os.path.exists(dataset_config_path):
+        os.remove(dataset_config_path)
+
+    # Prompt user to enter dataset path first
+    print("🔍 Let's begin by selecting your dataset.")
+    dataset_path = get_dataset_path()
+    print(f"📁 Using dataset: {dataset_path}")
+
+    # Main command loop
     while True:
-        user_input = Prompt.ask("[bold green]🧠 Enter your request (or 'exit' to quit)[/]")
+        user_input = input("\n🧠 Enter your request (or type 'exit' to quit): ")
         if user_input.lower() == 'exit':
-            console.print("[bold yellow]👋 Exiting Copilot. Goodbye![/bold yellow]")
+            print("👋 Exiting Copilot. Goodbye!")
             break
 
-        if any(word in user_input.lower() for word in ["then", "and", "after"]):
+        if "then" in user_input or "and" in user_input or "after" in user_input:
             execute_multiple_commands(user_input)
         else:
             operation = NL_processor(user_input)
             route_command(operation, user_input)
+
 
 
 if __name__ == "__main__":

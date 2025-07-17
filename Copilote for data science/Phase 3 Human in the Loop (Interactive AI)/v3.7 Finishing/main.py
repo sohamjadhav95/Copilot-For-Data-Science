@@ -10,6 +10,8 @@ from Engine_Modify_data import Groq_Input as Modify_Groq_Input, undo_last_change
 from NL_processor import genral_response_chatbot
 from Engine_Data_analysis import *
 from rag_command_parser import basic_rag
+from Core_Automation_Engine.Data import get_dataset_path
+import os
 import pandas as pd
 import time
 import traceback
@@ -129,12 +131,26 @@ def route_command(operation, user_input):
     else:
         print("Unable to determine the operation. Please try again.")
 
+
 @handle_errors
 def main():
     """Main loop to receive user input and execute commands."""
+
+    # Reset dataset path each time the program runs (optional)
+    dataset_config_path = os.path.join("config", "dataset_path.txt")
+    if os.path.exists(dataset_config_path):
+        os.remove(dataset_config_path)
+
+    # Prompt user to enter dataset path first
+    print("🔍 Let's begin by selecting your dataset.")
+    dataset_path = get_dataset_path()
+    print(f"📁 Using dataset: {dataset_path}")
+
+    # Main command loop
     while True:
-        user_input = input("Enter your request (or 'exit' to quit): ")
+        user_input = input("\n🧠 Enter your request (or type 'exit' to quit): ")
         if user_input.lower() == 'exit':
+            print("👋 Exiting Copilot. Goodbye!")
             break
 
         if "then" in user_input or "and" in user_input or "after" in user_input:
@@ -142,6 +158,7 @@ def main():
         else:
             operation = NL_processor(user_input)
             route_command(operation, user_input)
+
 
 if __name__ == "__main__":
     main()
