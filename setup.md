@@ -13,8 +13,8 @@ Ensure you have the following installed:
 | Python | 3.10+           | Install from [python.org](https://www.python.org/downloads/) |
 | pip    | Latest          | Comes with Python                                            |
 | Git    | Latest          | [git-scm.com](https://git-scm.com/)                          |
-| ttyd   | Precompiled EXE | Terminal UI in browser                                       |
-| ngrok  | Free account    | For public browser access                                    |
+| ttyd   | Precompiled EXE | For browser-based terminal UI                                |
+| ngrok  | Free account    | Required to expose terminal app publicly (optional)          |
 
 ---
 
@@ -44,7 +44,7 @@ pip install -r requirements.txt
 
 Make sure to clean up or confirm packages in `requirements.txt`. It typically includes:
 
-```txt
+```text
 rich
 pandas
 scikit-learn
@@ -54,33 +54,24 @@ groq
 
 ---
 
-## 🔐 3. Set Up API Keys
+## 🔐 3. Set Up API Key (Secure, Auto-Managed)
 
-The project uses the **Groq API** for code generation and explanations.
-
-* Replace the placeholder Groq API key in your code files with your actual API key.
-* (Optional) Create a `.env` file and load it using `python-dotenv`.
-
-Example `.env`:
-
-```env
-GROQ_API_KEY=your-api-key-here
-```
+* On first run, the system will prompt you for your **Groq API key**.
+* It will be securely saved in `config/api_key.txt`.
+* The API key **automatically expires in 7 days** and will be requested again.
+* You do **not** need to hardcode your key manually.
 
 ---
 
-## 🧾 4. Prepare Your Dataset
+## 📂 4. Set Dataset Path (Auto-Prompted)
 
-* Place your dataset inside the data folder (or wherever expected).
-* Update the dataset path inside `Core_Automation_Engine/Data.py` accordingly:
-
-```python
-filepath = lambda: "./data/your_dataset.csv"
-```
+* On first run, you'll be asked to enter the full path to your dataset (.csv).
+* This will be saved in `config/dataset_path.txt` and used across the project.
+* You can change the dataset by deleting the file or resetting within the app.
 
 ---
 
-## 🚀 5. One-Click Launch via .bat File
+## 🚀 5. One-Click Launch via `.bat` File
 
 We’ve included a `.bat` file for Windows users:
 
@@ -94,22 +85,22 @@ timeout /t 2 >nul
 start "" "C:\Path\To\ngrok.exe" http 7681
 ```
 
-> Edit this file to match your `ttyd.exe` and `ngrok.exe` paths.
+> Edit this file to match your actual paths to `ttyd.exe` and `ngrok.exe`
 
 ### ✅ `Launch Copilot.lnk`
 
-* This is a shortcut with a custom icon.
-* You can double-click it just like a native app.
+* A shortcut to run the `.bat` file with a custom icon
+* Place it on your desktop for one-click access
 
 ---
 
 ## 🌐 6. Run and Interact
 
-After double-clicking the shortcut or running the `.bat` file manually, you’ll:
+After launching:
 
-* Open a terminal session in your browser
-* Be able to type natural language commands
-* Receive output from the AI Copilot
+* A terminal session will open in your browser
+* You’ll be able to type natural language commands
+* Outputs, visuals, and results will be returned inside the rich terminal interface
 
 ---
 
@@ -129,6 +120,12 @@ After double-clicking the shortcut or running the `.bat` file manually, you’ll
 
 ```
 Copilot-For-Data-Science/
+├── config/
+│   ├── api_key.txt
+│   ├── dataset_path.txt
+│   ├── api_manager.py
+│   └── [other config files]
+│
 ├── launch_copilot.bat
 ├── Launch Copilot.lnk
 ├── copilot_icon.ico
@@ -138,18 +135,35 @@ Copilot-For-Data-Science/
 ├── setup.md
 │
 ├── Core_Automation_Engine/
+│   ├── Engine_Data_analysis.py
+│   ├── Engine_Display_data.py
+│   ├── Engine_Modify_data.py
+│   ├── Engine_Visualize_data.py
+│   ├── NL_processor.py
+│   ├── Data.py
+│   └── [other core engine files]
+│
 ├── Machine_Learning/
+│   ├── ML_Models_Engine_autogluon.py
+│   └── [other ML files]
+│
 ├── Retrival_Agumented_Generation/
+│   ├── rag_command_parser.py
+│   ├── commands_database.csv
+│   └── [other RAG files]
+│
 └── data/
+    └── [your datasets]
 ```
 
 ---
 
 ## 💡 Troubleshooting
 
-* ❌ `Python not found` → Ensure Python is installed and added to PATH
+* ❌ `Python not found` → Install and add Python to PATH
 * ❌ `Module not found` → Rerun `pip install -r requirements.txt`
-* ❌ `Groq API error` → Check if your API key is valid and active
+* ❌ `Groq API error` → Check if your API key is valid or expired
+* ❌ `Dataset error` → Check that path exists and points to a valid `.csv` file
 
 ---
 
@@ -164,4 +178,4 @@ Reach out to us:
 
 ## ✅ You're Ready!
 
-You now have a terminal-based Copilot AI running locally, with rich CLI and browser access. Happy building! 🚀
+You now have a fully interactive Copilot AI running in your terminal. Happy building! 🚀
