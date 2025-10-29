@@ -5,7 +5,7 @@ import time
 import pyautogui
 from dash import dcc, html, Input, Output, State
 import plotly.express as px
-from groq import Groq
+from openai import OpenAI
 import matplotlib.pyplot as plt
 import seaborn as sns
 import webbrowser
@@ -14,7 +14,7 @@ from fpdf import FPDF
 import json
 import re
 from config.api_manager import get_api_key
-client = Groq(api_key=get_api_key())  # Replace with your Groq API key
+client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=get_api_key())
 
 
 def load_and_preprocess_data():
@@ -114,7 +114,7 @@ class Dashboard:
         """
         
         response = client.chat.completions.create(
-            model="openai/gpt-oss-120b",
+            model="qwen/qwen3-coder-flash",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3,
             max_tokens=1024
@@ -262,7 +262,7 @@ class DataAnalysisReport:
         
         try:
             response = client.chat.completions.create(
-                model="openai/gpt-oss-120b",  # Replace with your actual model
+                model="qwen/qwen3-coder-flash",  # Replace with your actual model
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.5,
                 max_tokens=4096

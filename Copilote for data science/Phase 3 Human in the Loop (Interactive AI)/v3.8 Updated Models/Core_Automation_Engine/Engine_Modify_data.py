@@ -1,13 +1,16 @@
 import os
 import shutil
 import re
-from groq import Groq
+from openai import OpenAI
 from Data import Data_rows, filepath
 from SQL_Operations import SQLExecutor
 from NL_processor import result_response
 from config.api_manager import get_api_key
-# Configure the Groq API with your API key
-client = Groq(api_key=get_api_key())
+# Configure the OpenRouter API with your API key
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key="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",
+)
 
 first_100_rows, last_100_rows = Data_rows()
 data = filepath()
@@ -50,7 +53,7 @@ def original_code_generation_approach(user_input):
         )
 
         completion = client.chat.completions.create(
-            model="openai/gpt-oss-120b",
+            model="qwen/qwen3-coder-flash",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.6,
             max_tokens=4096,
@@ -99,7 +102,7 @@ def generate_code_error_handling(user_input, generated_code, e):
         )
 
         completion = client.chat.completions.create(
-            model="openai/gpt-oss-120b",
+            model="qwen/qwen3-coder-flash",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.6,
             max_tokens=4096,

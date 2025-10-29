@@ -5,7 +5,7 @@ from autogluon.tabular import TabularPredictor
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, mean_absolute_percentage_error, confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
-from groq import Groq
+from openai import OpenAI
 from pycaret.clustering import setup, create_model, assign_model, save_model, load_model
 from sklearn.preprocessing import StandardScaler
 import joblib
@@ -20,7 +20,7 @@ sys.path.append(r"E:\Projects\Copilot-For-Data-Science\Copilote for data science
 from Data import filepath
 
 
-client = Groq(api_key=get_api_key())
+client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=get_api_key())
 
 def task_type(user_input):
     """
@@ -46,7 +46,7 @@ def task_type(user_input):
     
 
     completion = client.chat.completions.create(
-        model="openai/gpt-oss-120b",
+        model="qwen/qwen3-coder-flash",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.2,
         max_tokens=50,
@@ -85,7 +85,7 @@ class SupervisedUniversalMachineLearning:
 
         try:
             completion = client.chat.completions.create(
-                model="openai/gpt-oss-120b",
+                model="qwen/qwen3-coder-flash",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.4,
                 max_tokens=1024,

@@ -15,14 +15,17 @@ from Engine_Modify_data import Groq_Input as Modify_Groq_Input, undo_last_change
 from NL_processor import genral_response_chatbot
 from Engine_Data_analysis import *
 from rag_command_parser import basic_rag
-from groq import Groq
+from openai import OpenAI
 from Core_Automation_Engine.Data import get_dataset_path
 import os
 from ML_Models_Engine_autogluon import *
 from config.api_manager import get_api_key
 
 
-client = Groq(api_key=get_api_key())
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key="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",
+)
 
 ML = SupervisedUniversalMachineLearning()
 dashboard = Dashboard()
@@ -54,7 +57,7 @@ def explain_error(error_message):
         """
 
         completion = client.chat.completions.create(
-            model="openai/gpt-oss-120b",
+            model="qwen/qwen3-coder-flash",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.4,
             max_tokens=1024,

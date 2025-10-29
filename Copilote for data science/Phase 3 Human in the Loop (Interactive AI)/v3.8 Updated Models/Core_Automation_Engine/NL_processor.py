@@ -1,9 +1,12 @@
 import re
-from groq import Groq
+from openai import OpenAI
 from Data import dataset_features
 from config.api_manager import get_api_key
-# Configure the Groq API with your API key
-client = Groq(api_key=get_api_key())  # Replace with your Groq API key
+# Configure the OpenRouter API with your API key
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key="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",
+)
 
 def NL_processor(user_input):
     try:
@@ -42,7 +45,7 @@ def NL_processor(user_input):
         """
 
         completion = client.chat.completions.create(
-            model="openai/gpt-oss-120b",  
+            model="qwen/qwen3-coder-flash",  
             messages=[{"role": "user", "content": prompt}],
             temperature=0.4,
             max_tokens=4096,
@@ -98,7 +101,7 @@ def split_multi_commands(user_input):
         )
 
         completion = client.chat.completions.create(
-            model="openai/gpt-oss-120b",
+            model="qwen/qwen3-coder-flash",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.4,
             max_tokens=1024,
@@ -130,7 +133,7 @@ def result_response(user_input ,result):
     )
 
     completion = client.chat.completions.create(
-        model="openai/gpt-oss-120b",
+        model="qwen/qwen3-coder-flash",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.4,
         max_tokens=1024,
@@ -154,7 +157,7 @@ def genral_response_chatbot(user_input):
     )
 
     completion = client.chat.completions.create(
-        model="openai/gpt-oss-120b",
+        model="qwen/qwen3-coder-flash",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.8,
         max_tokens=1024,

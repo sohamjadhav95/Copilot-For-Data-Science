@@ -1,9 +1,12 @@
 import csv
-from groq import Groq
+from openai import OpenAI
 import pandas as pd
 import os
 from config.api_manager import get_api_key
-client = Groq(api_key=get_api_key())
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key="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",
+)
 
 CSV_FILE = r"E:\Projects\Copilot-For-Data-Science\Copilote for data science\Phase 3 Human in the Loop (Interactive AI)\v3.8 Updated Models\Retrival_Agumented_Generation\commands_database.csv"
 
@@ -118,7 +121,7 @@ def modify_command_api(user_input):
 
     try:
         completion = client.chat.completions.create(
-            model="openai/gpt-oss-120b",
+            model="qwen/qwen3-coder-flash",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.4,
             max_tokens=100,
