@@ -29,7 +29,7 @@ def original_code_generation_approach(user_input):
         )
 
         completion = client.chat.completions.create(
-            model="deepseek-r1-distill-llama-70b",
+            model="openai/gpt-oss-120b",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.6,
             max_tokens=4096,
@@ -80,7 +80,7 @@ def generate_code_error_handling(user_input, generated_code, e):
         )
 
         completion = client.chat.completions.create(
-            model="deepseek-r1-distill-llama-70b",
+            model="openai/gpt-oss-120b",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.6,
             max_tokens=4096,

@@ -114,7 +114,7 @@ class Dashboard:
         """
         
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3,
             max_tokens=1024
@@ -262,7 +262,7 @@ class DataAnalysisReport:
         
         try:
             response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",  # Replace with your actual model
+                model="openai/gpt-oss-120b",  # Replace with your actual model
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.5,
                 max_tokens=4096

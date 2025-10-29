@@ -46,7 +46,7 @@ def task_type(user_input):
     
 
     completion = client.chat.completions.create(
-        model="meta-llama/llama-4-scout-17b-16e-instruct",
+        model="openai/gpt-oss-120b",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.2,
         max_tokens=50,
@@ -85,7 +85,7 @@ class SupervisedUniversalMachineLearning:
 
         try:
             completion = client.chat.completions.create(
-                model="meta-llama/llama-4-scout-17b-16e-instruct",
+                model="openai/gpt-oss-120b",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.4,
                 max_tokens=1024,

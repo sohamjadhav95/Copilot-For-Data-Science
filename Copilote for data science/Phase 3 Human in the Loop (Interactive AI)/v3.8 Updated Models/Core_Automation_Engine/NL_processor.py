@@ -42,7 +42,7 @@ def NL_processor(user_input):
         """
 
         completion = client.chat.completions.create(
-            model="openai/gpt-oss-20b",  
+            model="openai/gpt-oss-120b",  
             messages=[{"role": "user", "content": prompt}],
             temperature=0.4,
             max_tokens=4096,
@@ -98,7 +98,7 @@ def split_multi_commands(user_input):
         )
 
         completion = client.chat.completions.create(
-            model="openai/gpt-oss-20b",
+            model="openai/gpt-oss-120b",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.4,
             max_tokens=1024,
@@ -130,7 +130,7 @@ def result_response(user_input ,result):
     )
 
     completion = client.chat.completions.create(
-        model="openai/gpt-oss-20b",
+        model="openai/gpt-oss-120b",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.4,
         max_tokens=1024,
@@ -154,7 +154,7 @@ def genral_response_chatbot(user_input):
     )
 
     completion = client.chat.completions.create(
-        model="openai/gpt-oss-20b",
+        model="openai/gpt-oss-120b",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.8,
         max_tokens=1024,
